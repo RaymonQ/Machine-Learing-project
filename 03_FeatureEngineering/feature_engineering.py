@@ -58,7 +58,7 @@ words_train, words_test, labels_train, labels_test = train_test_split(df_train['
 
 # converting the words to TF-IDF vectors
 
-tfidf_default = TfIdf()
+# tfidf_default = TfIdf()
 # # evaluate default parameters
 # print(tfidf_default.get_params())
 
@@ -71,8 +71,8 @@ min_df = 1
 # default: 1 (range[0,1]) -> ignore terms that have a higher document frequency
 max_df = 1
 # default = None -> max number of words to be taken into account
-# setting it to 500 to prevent to large vector-pickles files
-max_features = 400
+# setting it to 250 to prevent to large vector-pickles files
+max_features = 250
 # default = False -> apply sublinear transfer function
 sublinear_tf = False
 
