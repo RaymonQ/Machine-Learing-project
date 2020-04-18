@@ -33,8 +33,14 @@ print(multinominalBayes.get_params())
 # fit the model
 multinominalBayes.fit(features_train, labels_train)
 
-predicted_classes = multinominalBayes.predict(features_test)
+predicted_classes_train = multinominalBayes.predict(features_train)
+predicted_classes_test = multinominalBayes.predict(features_test)
 
-print('The accuracy of MultinominalBayes is: ' + str(round(accuracy_score(labels_test, predicted_classes)*100, 2))
-      + ' %.')
+print('The accuracy of MultinominalBayes on the TRAIN set is: ' +
+      str(round(accuracy_score(labels_train, predicted_classes_train)*100, 2)) + ' %.')
+print('The accuracy of MultinominalBayes on the TEST set is: ' +
+      str(round(accuracy_score(labels_test, predicted_classes_test)*100, 2)) + ' %.')
 
+# The output for 1500 unigrams is:
+# The accuracy of MultinominalBayes on the TRAIN set is: 43.28 %.
+# The accuracy of MultinominalBayes on the TEST set is: 38.78 %.

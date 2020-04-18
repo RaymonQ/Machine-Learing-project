@@ -22,6 +22,9 @@ with open(path_test, 'rb') as data:
 # ADD CODE FEATURE ENGINEERING HERE:
 # structure of dataframe rows: 0,1...N columns: 'article_number', 'aricticle_words', 'topic'
 
+# put true if filtering the irrelevant articles is desired
+filter_irrelevant = True
+
 # creating a ditionary with the labels
 codes_categories = {'ARTS CULTURE ENTERTAINMENT': 0,
                     'BIOGRAPHIES PERSONALITIES PEOPLE': 1,
@@ -41,6 +44,16 @@ df_train = df_train.replace({'topic_code': codes_categories})
 
 df_test['topic_code'] = df_test['topic']
 df_test = df_test.replace({'topic_code': codes_categories})
+
+
+# filtering out the irrelevant articles
+if filter_irrelevant:
+    print('Number of articles in Test set prior to filtering: ' + str(df_train.shape[0]))
+    relevant_articles_train = df_train['topic_code'] != 10
+    df_train = df_train[relevant_articles_train]
+    relevant_articles_test = df_test['topic_code'] != 10
+    df_test = df_test[relevant_articles_test]
+    print('Number of articles in Test set after filtering: ' + str(df_train.shape[0]))
 
 
 # splitting our training data into a training and a test set to be able to validate our methods without
@@ -72,9 +85,9 @@ min_df = 1
 max_df = 1
 # default = None -> max number of words to be taken into account
 # setting it to 250 to prevent to large vector-pickles files
-max_features = 250
+max_features = 1500
 # default = False -> apply sublinear transfer function
-sublinear_tf = False
+sublinear_tf = True
 
 # constructing custom TFIDF object with the above parameters
 tfidf_custom = TfIdf(ngram_range=ngram_range, max_df=max_df, min_df=min_df, max_features=max_features,

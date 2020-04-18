@@ -33,7 +33,15 @@ print(gbc_default.get_params())
 # fit the model
 gbc_default.fit(features_train, labels_train)
 
-predicted_classes = gbc_default.predict(features_test)
+predicted_classes_train = gbc_default.predict(features_train)
+predicted_classes_test = gbc_default.predict(features_test)
 
-print('The accuracy of the default Random Forest classifier is: ' +
-      str(round(accuracy_score(labels_test, predicted_classes)*100, 2)) + ' %.')
+print('The accuracy of the default GBM classifier on the TRAIN set is: ' +
+      str(round(accuracy_score(labels_train, predicted_classes_train)*100, 2)) + ' %.')
+print('The accuracy of the default GBM classifier on the TEST set is: ' +
+      str(round(accuracy_score(labels_test, predicted_classes_test)*100, 2)) + ' %.')
+
+# The output for 1500 unigrams (took an awful lot of time) is:
+# The accuracy of the default GBM classifier on the TRAIN set is: 50.76 %.
+# The accuracy of the default GBM classifier on the TEST set is: 38.16 %.
+

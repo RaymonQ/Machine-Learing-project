@@ -33,7 +33,15 @@ print(knn_default.get_params())
 # fit the model
 knn_default.fit(features_train, labels_train)
 
-predicted_classes = knn_default.predict(features_test)
+predicted_classes_train = knn_default.predict(features_train)
+predicted_classes_test = knn_default.predict(features_test)
 
-print('The accuracy of the default KNN is: ' + str(round(accuracy_score(labels_test, predicted_classes)*100, 2))
-      + ' %.')
+print('The accuracy of the default KNN classifier on the TRAIN set is: ' +
+      str(round(accuracy_score(labels_train, predicted_classes_train)*100, 2)) + ' %.')
+
+print('The accuracy of the default KNN classifier on the TEST set is: ' +
+      str(round(accuracy_score(labels_test, predicted_classes_test)*100, 2)) + ' %.')
+
+#  The output for 1500 unigrams is:
+# The accuracy of the default KNN classifier on the TRAIN set is: 21.07 %.
+# The accuracy of the default KNN classifier on the TEST set is: 20.13 %.
