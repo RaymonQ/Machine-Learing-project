@@ -80,12 +80,12 @@ words_train, words_test, labels_train, labels_test = train_test_split(df_train['
 # default: (1,1) -> only unigrams , (1,2) -> uni and bigrams, (2,2) -> only bigrams...
 ngram_range = (1, 1)
 # default: 1 (range[0,1]) -> ignore terms that have a lower document frequency
-min_df = 1
+min_df = 10
 # default: 1 (range[0,1]) -> ignore terms that have a higher document frequency
-max_df = 1
+max_df = 1.
 # default = None -> max number of words to be taken into account
 # setting it to 250 to prevent to large vector-pickles files
-max_features = 1500
+max_features = 300
 # default = False -> apply sublinear transfer function
 sublinear_tf = True
 

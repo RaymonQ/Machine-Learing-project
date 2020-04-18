@@ -2,6 +2,13 @@ import pickle
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import accuracy_score
 
+
+def dump_model(model):
+    with open('Models/MNB.pickle', 'wb') as output:
+        pickle.dump(model, output)
+    print('\nmodel dumped!')
+
+
 # specify your directory where the project is here
 # path Yannick:
 path_project = "/Users/yannickschnider/PycharmProjects/COMP9417-Group-Assignment/"
@@ -40,7 +47,11 @@ print('The accuracy of MultinominalBayes on the TRAIN set is: ' +
       str(round(accuracy_score(labels_train, predicted_classes_train)*100, 2)) + ' %.')
 print('The accuracy of MultinominalBayes on the TEST set is: ' +
       str(round(accuracy_score(labels_test, predicted_classes_test)*100, 2)) + ' %.')
+dump_model(multinominalBayes)
+# The output for 1000 unigrams is:
+# The accuracy of MultinominalBayes on the TRAIN set is: 78.83 %.
+# The accuracy of MultinominalBayes on the TEST set is: 74.0 %.
+# The output for 300 unigrams is:
+# The accuracy of MultinominalBayes on the TRAIN set is: 74.66 %.
+# The accuracy of MultinominalBayes on the TEST set is: 70.96 %.
 
-# The output for 1500 unigrams is:
-# The accuracy of MultinominalBayes on the TRAIN set is: 43.28 %.
-# The accuracy of MultinominalBayes on the TEST set is: 38.78 %.
