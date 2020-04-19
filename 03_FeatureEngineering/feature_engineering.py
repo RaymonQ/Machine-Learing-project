@@ -15,9 +15,6 @@ with open(path_train, 'rb') as data:
 with open(path_test, 'rb') as data:
     df_test = pickle.load(data)
 
-# # printing the first 3 samples to see if the import worked
-# print(df_train.head(3))
-# print(df_test.head(3))
 
 # ADD CODE FEATURE ENGINEERING HERE:
 # structure of dataframe rows: 0,1...N columns: 'article_number', 'aricticle_words', 'topic'
@@ -45,6 +42,9 @@ df_train = df_train.replace({'topic_code': codes_categories})
 df_test['topic_code'] = df_test['topic']
 df_test = df_test.replace({'topic_code': codes_categories})
 
+# storing the unfiltered sets for validation later
+df_test_unfiltered = df_test
+df_train_unfiltered = df_train
 
 # filtering out the irrelevant articles
 if filter_irrelevant:
@@ -62,18 +62,6 @@ if filter_irrelevant:
 # here 80 percent belong to the training set and 20 to the new test set
 words_train, words_test, labels_train, labels_test = train_test_split(df_train['article_words'], df_train['topic_code'],
                                                                       test_size=0.2, random_state=0)
-# # check on the sizes of the sets:
-# print(words_train.shape)
-# print(labels_train.shape)
-# print(words_test.shape)
-# print(labels_test.shape)
-
-
-# converting the words to TF-IDF vectors
-
-# tfidf_default = TfIdf()
-# # evaluate default parameters
-# print(tfidf_default.get_params())
 
 # parameters (to be tuned)
 
@@ -107,9 +95,17 @@ print(features_test.shape)
 with open('Data/df_train.pickle', 'wb') as output:
     pickle.dump(df_train, output)
 
+# df_train_unfiltered
+with open('Data/df_train_unfiltered.pickle', 'wb') as output:
+    pickle.dump(df_train_unfiltered, output)
+
 # df_test
 with open('Data/df_test.pickle', 'wb') as output:
     pickle.dump(df_test, output)
+
+# df_test_unfiltered
+with open('Data/df_test_unfiltered.pickle', 'wb') as output:
+    pickle.dump(df_test_unfiltered, output)
 
 # features_train
 with open('Data/features_train.pickle', 'wb') as output:
