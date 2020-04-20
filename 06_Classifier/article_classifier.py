@@ -41,7 +41,7 @@ def classify_articles(model, features, labels, stats, dataset):
             print(top10)
             print('\nCategory ' + inv_code_categories[i] + ': ' + str(hits.astype(int).sum()) + '/10.\n\n')
 
-    print('OVERALL RESULT: ' + str(overall_hits) + '/100.')
+    print('OVERALL RESULT: ' + str(overall_hits) + '/' + str(int(probab_test.shape[1])*10) + ".")
     if stats:
         print('(Performance on ' + dataset + '.)\n')
 
@@ -131,3 +131,24 @@ for classifier in classifiers:
     classify_articles(classifier, features_final_test_unfilterd, labels_final_test_unfilterd, 0,
                       'FINAL TEST data set WITH irrelevant articles')
 
+# Results on test set from training set trained WITH Categorie Irrelevant:
+# GBM = 73/110
+# Knn = 75/110
+# MNB = 73/110
+# RF =  71/110
+# SVC = 84/110
+
+# Results on FINAL test trained WITH Categorie Irrelevant:
+# GBM = 52/110
+# Knn = 56/110
+# MNB = 54/110
+# RF =  56/110
+# SVC = 62/110
+
+
+# Results on FINAL test trained WITHOUT Categorie Irrelevant:
+# GBM = 47/100
+# Knn = 42/100
+# MNB = 45/100
+# RF =  47/100
+# SVC = 51/100
