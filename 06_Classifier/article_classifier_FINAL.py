@@ -7,7 +7,8 @@ def sort_probs(probs, cat):
     return probs.sort_values(by=cat, ascending=False)[[cat, 'topic_code']]
 
 
-def classify_articles(model, model_names, model_number, features_train, features_test, labels_train, labels_test, stats, dataset):
+def classify_articles(model, model_names, model_number, features_train, features_test, labels_train, labels_test, stats,
+                      topx, dataset):
     # fitting/training the model on the proved training data
     model.fit(features_train, labels_train)
     probab_test = model.predict_proba(features_test)
@@ -38,14 +39,15 @@ def classify_articles(model, model_names, model_number, features_train, features
     overall_hits = 0
     for i in range(probab_test.shape[1]):
         column = "p" + str(i)
-        top10 = sort_probs(df_proba, column).head(10)
+        top10 = sort_probs(df_proba, column).head(topx)
         hits = top10['topic_code'] == i
         overall_hits += hits.astype(int).sum()
         if stats:
             print(top10)
-            print('\nCategory ' + inv_code_categories[i] + ': ' + str(hits.astype(int).sum()) + '/10.\n\n')
+            print('\nCategory ' + inv_code_categories[i] + ': ' + str(hits.astype(int).sum()) + '/' + str(topx) +
+                  '.\n\n')
 
-    print('OVERALL RESULT: ' + str(overall_hits) + '/' + str(int(probab_test.shape[1])*10) + ".")
+    print('OVERALL RESULT: ' + str(overall_hits) + '/' + str(int(probab_test.shape[1])*topx) + ".")
     if stats:
         print('(Performance on ' + dataset + '.)\n')
 
@@ -70,6 +72,8 @@ with open(path_data + 'RF.pickle', 'rb') as data:
     rf = pickle.load(data)
 with open(path_data + 'SVM.pickle', 'rb') as data:
     svm = pickle.load(data)
+with open(path_data + 'NN.pickle', 'rb') as data:
+    nn = pickle.load(data)
 with open(path_data2 + 'df_test.pickle', 'rb') as data:
     df_test = pickle.load(data)
 with open(path_data2 + 'df_train.pickle', 'rb') as data:
@@ -81,19 +85,21 @@ with open(path_data2 + 'df_train_unfiltered.pickle', 'rb') as data:
 with open(path_data2 + 'tfidf_custom.pickle', 'rb') as data:
     tfidf_custom = pickle.load(data)
 
-classifiers = [gbm, knn, mnb, rf, svm]
-classifiers_name = ['GradientBoost', 'NearestNeighbour', 'MultinomBayes', 'RandomForest', 'SupportVector']
+classifiers = [gbm, knn, mnb, rf, svm, nn]
+classifiers_name = ['GradientBoost', 'NearestNeighbour', 'MultinomBayes', 'RandomForest', 'SupportVector',
+                    'Multiperceptron']
 
 # show the stats for each categorie for true
 show_stats = 0
+# show the topX of each category
+topX = 10
 
 # FILTERED DATA
 # FINAL test data set w/o irrelevant articles trained with FINAL training set w/o the irrelevant articles
 
 # fitting the tfidf transform on the whole train data
-tfidf_custom.fit(df_train['article_words'])
+features_train_filtered = tfidf_custom.fit_transform(df_train['article_words']).toarray()
 # applying the tfidf transform
-features_train_filtered = tfidf_custom.transform(df_train['article_words']).toarray()
 features_test_filtered = tfidf_custom.transform(df_test['article_words']).toarray()
 labels_train_filtered = df_train['topic_code']
 labels_test_filtered = df_test['topic_code']
@@ -101,42 +107,41 @@ labels_test_filtered = df_test['topic_code']
 num = 0
 for classifier in classifiers:
     classify_articles(classifier, classifiers_name, num, features_train_filtered, features_test_filtered,
-                      labels_train_filtered, labels_test_filtered, show_stats,
+                      labels_train_filtered, labels_test_filtered, show_stats, topX,
                       'FINAL TEST data set WITHOUT irrelevant articles')
     num += 1
 
-
-# UNFILTERED DATA
-# FINAL test data set WITH irrelevant articles trained with FINAL training set w/o the irrelevant articles
-
-
-# applying the tfidf transform
-features_test_unfiltered = tfidf_custom.transform(df_test_unfiltered['article_words']).toarray()
-labels_test_unfiltered = df_test_unfiltered['topic_code']
-
-num = 0
-for classifier in classifiers:
-    classify_articles(classifier, classifiers_name, num, features_train_filtered, features_test_unfiltered,
-                      labels_train_filtered, labels_test_unfiltered, show_stats,
-                      'FINAL TEST data set WITH irrelevant articles')
-    num += 1
-
-# FINAL test data set WITH irrelevant articles trained with FINAL training set WITH the irrelevant articles
-
-# fitting the tfidf transform on the whole UNFILTERED train data
-tfidf_custom.fit(df_train_unfiltered['article_words'])
-# applying the tfidf transform
-features_train_unfiltered = tfidf_custom.transform(df_train_unfiltered['article_words']).toarray()
-features_test_unfiltered = tfidf_custom.transform(df_test_unfiltered['article_words']).toarray()
-labels_train_unfiltered = df_train_unfiltered['topic_code']
-labels_test_unfiltered = df_test_unfiltered['topic_code']
-
-num = 0
-for classifier in classifiers:
-    classify_articles(classifier, classifiers_name, num, features_train_unfiltered, features_test_unfiltered,
-                      labels_train_unfiltered, labels_test_unfiltered, show_stats,
-                      'FINAL TEST data set WITH TRAINED irrelevant articles')
-    num += 1
+#
+# # UNFILTERED DATA
+# # FINAL test data set WITH irrelevant articles trained with FINAL training set w/o the irrelevant articles
+#
+#
+# # applying the tfidf transform
+# features_test_unfiltered = tfidf_custom.transform(df_test_unfiltered['article_words']).toarray()
+# labels_test_unfiltered = df_test_unfiltered['topic_code']
+#
+# num = 0
+# for classifier in classifiers:
+#     classify_articles(classifier, classifiers_name, num, features_train_filtered, features_test_unfiltered,
+#                       labels_train_filtered, labels_test_unfiltered, show_stats, topX,
+#                       'FINAL TEST data set WITH irrelevant articles')
+#     num += 1
+#
+# # FINAL test data set WITH irrelevant articles trained with FINAL training set WITH the irrelevant articles
+#
+# # fitting the tfidf transform on the whole UNFILTERED train data
+# features_train_unfiltered = tfidf_custom.fit_transform(df_train_unfiltered['article_words']).toarray()
+# # applying the tfidf transform
+# features_test_unfiltered = tfidf_custom.transform(df_test_unfiltered['article_words']).toarray()
+# labels_train_unfiltered = df_train_unfiltered['topic_code']
+# labels_test_unfiltered = df_test_unfiltered['topic_code']
+#
+# num = 0
+# for classifier in classifiers:
+#     classify_articles(classifier, classifiers_name, num, features_train_unfiltered, features_test_unfiltered,
+#                       labels_train_unfiltered, labels_test_unfiltered, show_stats, TopX,
+#                       'FINAL TEST data set WITH TRAINED irrelevant articles')
+#     num += 1
 
 # OUTPUT UNTUNED :
 

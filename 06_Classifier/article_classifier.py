@@ -7,7 +7,7 @@ def sort_probs(probs, cat):
     return probs.sort_values(by=cat, ascending=False)[[cat, 'topic_code']]
 
 
-def classify_articles(model, features, labels, stats, dataset):
+def classify_articles(model, features, labels, stats, topx, dataset):
     print('\nClassifier: ' + str(model) + '\n')
     print('Performance on ' + dataset + '.\n')
     probab_test = model.predict_proba(features)
@@ -34,14 +34,15 @@ def classify_articles(model, features, labels, stats, dataset):
     overall_hits = 0
     for i in range(probab_test.shape[1]):
         column = "p" + str(i)
-        top10 = sort_probs(df_proba, column).head(10)
-        hits = top10['topic_code'] == i
+        top_x = sort_probs(df_proba, column).head(topx)
+        hits = top_x['topic_code'] == i
         overall_hits += hits.astype(int).sum()
         if stats:
-            print(top10)
-            print('\nCategory ' + inv_code_categories[i] + ': ' + str(hits.astype(int).sum()) + '/10.\n\n')
+            print(top_x)
+            print('\nCategory ' + inv_code_categories[i] + ': ' + str(hits.astype(int).sum()) + '/' + str(topx) +
+                  '.\n\n')
 
-    print('OVERALL RESULT: ' + str(overall_hits) + '/' + str(int(probab_test.shape[1])*10) + ".")
+    print('OVERALL RESULT: ' + str(overall_hits) + '/' + str(int(probab_test.shape[1])*topx) + ".")
     if stats:
         print('(Performance on ' + dataset + '.)\n')
 
@@ -66,6 +67,8 @@ with open(path_data + 'RF.pickle', 'rb') as data:
     rf = pickle.load(data)
 with open(path_data + 'SVM.pickle', 'rb') as data:
     svm = pickle.load(data)
+with open(path_data + 'NN.pickle', 'rb') as data:
+    nn = pickle.load(data)
 with open(path_data2 + 'labels_train.pickle', 'rb') as data:
     labels_train = pickle.load(data)
 with open(path_data2 + 'labels_test.pickle', 'rb') as data:
@@ -83,15 +86,20 @@ with open(path_data2 + 'df_train_unfiltered.pickle', 'rb') as data:
 with open(path_data2 + 'tfidf_custom.pickle', 'rb') as data:
     tfidf_custom = pickle.load(data)
 
-classifiers = [gbm, knn, mnb, rf, svm]
-classifiers_name = ['GradientBoost', 'NearestNeighbour', 'MultinomBayes', 'RandomForest', 'SupportVector']
+show_unfiltered_stats = 0
+
+classifiers = [gbm, knn, mnb, rf, svm, nn]
+classifiers_name = ['GradientBoost', 'NearestNeighbour', 'MultinomBayes', 'RandomForest', 'SupportVector',
+                    'Multiperceptron']
 
 # show the stats for each categorie for true
-show_stats = 0
+show_stats = 1
+# show the topX of each category
+topX = 10
 
 # get the performance for the test data set from the training data set w/o irrelevant articles
 for classifier in classifiers:
-    classify_articles(classifier, features_test, labels_test, show_stats,
+    classify_articles(classifier, features_test, labels_test, show_stats, topX,
                       'TEST data SET from TRAINING data WITHOUT irrelevant articles')
 
 
@@ -102,34 +110,33 @@ features_final_test = tfidf_custom.transform(df_test['article_words']).toarray()
 labels_final_test = df_test['topic_code']
 
 for classifier in classifiers:
-    classify_articles(classifier, features_final_test, labels_final_test, show_stats,
+    classify_articles(classifier, features_final_test, labels_final_test, show_stats, topX,
                       'FINAL TEST data set WITHOUT irrelevant articles')
 
+if show_unfiltered_stats:
+    # get the performance for the test data set from the training data set with the irrelevant articles
 
-# get the performance for the test data set from the training data set with the irrelevant articles
+    # split the unfiltered test set again (USE SAME test_size AS IN feature_engineering!)
+    # NOTE: of course the unfiltered test set and the filtered test set are not 100 percent matching each other since it
+    # cannot be assumed that the irrelevant articles are randomly distributed over the given Training set!
+    _, words_test_unfiltered, _, labels_test_unfiltered = train_test_split(df_train_unfiltered['article_words'],
+                                                                           df_train_unfiltered['topic_code'],
+                                                                           test_size=0.2, random_state=0)
 
-# split the unfiltered test set again (USE SAME test_size AS IN feature_engineering!)
-# NOTE: of course the unfiltered test set and the filtered test set are not 100 percent matching each other since it
-# cannot be assumed that the irrelevant articles are randomly distributed over the given Training set!
-_, words_test_unfiltered, _, labels_test_unfiltered = train_test_split(df_train_unfiltered['article_words'],
-                                                                       df_train_unfiltered['topic_code'],
-                                                                       test_size=0.2, random_state=0)
+    # applying the tfidf transform
+    features_test_unfiltered = tfidf_custom.transform(words_test_unfiltered).toarray()
 
-# applying the tfidf transform
-features_test_unfiltered = tfidf_custom.transform(words_test_unfiltered).toarray()
+    for classifier in classifiers:
+        classify_articles(classifier, features_test_unfiltered, labels_test_unfiltered, 0,
+                          'TEST data set from TRAINING data WITH irrelevant articles')
 
-for classifier in classifiers:
-    classify_articles(classifier, features_test_unfiltered, labels_test_unfiltered, 0,
-                      'TEST data set from TRAINING data WITH irrelevant articles')
+    # get the performance for the FINAL test data set with the irrelevant articles
+    features_final_test_unfilterd = tfidf_custom.transform(df_test_unfiltered['article_words']).toarray()
+    labels_final_test_unfilterd = df_test_unfiltered['topic_code']
 
-
-# get the performance for the FINAL test data set with the irrelevant articles
-features_final_test_unfilterd = tfidf_custom.transform(df_test_unfiltered['article_words']).toarray()
-labels_final_test_unfilterd = df_test_unfiltered['topic_code']
-
-for classifier in classifiers:
-    classify_articles(classifier, features_final_test_unfilterd, labels_final_test_unfilterd, 0,
-                      'FINAL TEST data set WITH irrelevant articles')
+    for classifier in classifiers:
+        classify_articles(classifier, features_final_test_unfilterd, labels_final_test_unfilterd, 0,
+                          'FINAL TEST data set WITH irrelevant articles')
 
 # Results on test set from training set trained WITH Categorie Irrelevant:
 # GBM = 73/110
@@ -152,3 +159,27 @@ for classifier in classifiers:
 # MNB = 45/100
 # RF =  47/100
 # SVC = 51/100
+
+# Results 2000 features, on final test set:
+# GBM = 67/100
+# Knn = 65/100
+# MNB = 68/100
+# RF =  66/100
+# SVC = 70/100
+# MLP = 70/100
+
+# Results 1000 features, on final test set:
+# GBM = 70/100
+# Knn = 66/100
+# MNB = 67/100
+# RF =  64/100
+# SVC = 69/100
+# MLP = 71/100
+
+# Results 1000 features, on final test set with 95 quantile:
+# GBM = 66/100
+# Knn = 61/100
+# MNB = 66/100
+# RF =  64/100
+# SVC = 69/100
+# MLP = 69/100

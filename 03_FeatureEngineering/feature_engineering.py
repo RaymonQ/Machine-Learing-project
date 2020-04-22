@@ -1,6 +1,7 @@
 import pickle
 from sklearn.feature_extraction.text import TfidfVectorizer as TfIdf
 from sklearn.model_selection import train_test_split
+import numpy as np
 
 # specify your directory where the project is here
 # path Yannick:
@@ -21,6 +22,7 @@ with open(path_test, 'rb') as data:
 
 # put true if filtering the irrelevant articles is desired
 filter_irrelevant = True
+crop_95 = False
 
 # creating a ditionary with the labels
 codes_categories = {'ARTS CULTURE ENTERTAINMENT': 0,
@@ -55,6 +57,27 @@ if filter_irrelevant:
     df_test = df_test[relevant_articles_test]
     print('Number of articles in Test set after filtering: ' + str(df_train.shape[0]))
 
+# drop out the 5 % of the longest articles:
+if crop_95:
+    df_train['News_length'] = df_train['article_words'].str.len()
+    # print(df_train['News_length'].describe())
+    quantile_95_train = df_train['News_length'].quantile(0.95)
+    df_train_95 = df_train[df_train['News_length'] < quantile_95_train]
+    print('training data shape pre-croppig: ')
+    print(df_train.shape)
+    print('training data shape post-croppig: ')
+    print(df_train_95.shape)
+    df_test['News_length'] = df_test['article_words'].str.len()
+    # print(df_test['News_length'].describe())
+    quantile_95_test = df_test['News_length'].quantile(0.95)
+    df_test_95 = df_test[df_test['News_length'] < quantile_95_test]
+    print('test data shape pre-croppig: ')
+    print(df_test.shape)
+    print('test data shape post-croppig: ')
+    print(df_test_95.shape)
+    # replace the old dataframes:
+    df_train = df_train_95
+    df_test = df_test_95
 
 # splitting our training data into a training and a test set to be able to validate our methods without
 # using the real test set...
@@ -73,7 +96,7 @@ min_df = 10
 max_df = 1.
 # default = None -> max number of words to be taken into account
 # setting it to 250 to prevent to large vector-pickles files
-max_features = 300
+max_features = 1000
 # default = False -> apply sublinear transfer function
 sublinear_tf = True
 
