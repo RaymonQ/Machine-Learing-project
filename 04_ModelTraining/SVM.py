@@ -175,7 +175,8 @@ if calc_fixed_model:
     svc_fixed = SVC(C=0.1, cache_size=200, class_weight=None, coef0=0.0, decision_function_shape='ovr', degree=3,
                     gamma='auto', kernel='linear', max_iter=-1, probability=True, random_state=0, shrinking=True,
                     tol=0.001, verbose=False)
-    svc_fixed = SVC(C=0.01, degree=1, gamma=100, kernel='poly', probability=True, random_state=0)
+    svc_fixed = SVC(C=0.01, degree=1, gamma=100, kernel='poly', probability=True, random_state=0,
+                    class_weight='balanced')
     # fit the models
     svc_fixed.fit(features_train, labels_train)
 
@@ -199,5 +200,7 @@ if calc_fixed_model:
 # The accuracy of default SVC on the TEST is: 57.65 %.
 # The accuracy of tuned SVC on the TRAIN set is: 73.5 %.
 # The accuracy of tuned SVC on the TEST is: 72.43 %.
-start_time = time.process_time()
-end_time = time.process_time() - start_time
+
+# 1000 unigrams unbalanced
+# The accuracy of fixed SVC on the TRAIN set is: 88.75 %.
+# The accuracy of fixed SVC on the TEST is: 76.21 %.

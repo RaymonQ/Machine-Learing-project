@@ -110,3 +110,14 @@ if calc_fixed_model:
     print('The accuracy of the fixed MLP classifier on the TEST set is: ' +
           str(round(accuracy_score(labels_test, predicted_classes_test) * 100, 2)) + ' %.')
     dump_model(mlp_fixed)
+
+# unigrams:
+# The accuracy of the fixed MLP classifier on the TRAIN set is: 92.81 %.
+# The accuracy of the fixed MLP classifier on the TEST set is: 76.0 %.
+# with bigrams:
+# The accuracy of the fixed MLP classifier on the TRAIN set is: 92.44 %.
+# The accuracy of the fixed MLP classifier on the TEST set is: 74.63 %.
+
+# unigrams, minority:
+# The accuracy of the fixed MLP classifier on the TRAIN set is: 96.05 %.
+# The accuracy of the fixed MLP classifier on the TEST set is: 76.31 %.

@@ -1,7 +1,13 @@
 import pickle
 from sklearn.feature_extraction.text import TfidfVectorizer as TfIdf
 from sklearn.model_selection import train_test_split
-import numpy as np
+from imblearn.over_sampling import SMOTE
+
+
+def cat_count(df):
+    counts = df.value_counts(dropna=False)
+    return counts
+
 
 # specify your directory where the project is here
 # path Yannick:
@@ -23,6 +29,7 @@ with open(path_test, 'rb') as data:
 # put true if filtering the irrelevant articles is desired
 filter_irrelevant = True
 crop_95 = False
+minoritySampling = False
 
 # creating a ditionary with the labels
 codes_categories = {'ARTS CULTURE ENTERTAINMENT': 0,
@@ -111,6 +118,16 @@ features_test = tfidf_custom.transform(words_test).toarray()
 # checking on the dimensions of the arrays
 print(features_train.shape)
 print(features_test.shape)
+
+print('before minority sampling :\n' + str(cat_count(labels_train)))
+if minoritySampling:
+    smote = SMOTE('minority')
+    for i in range(10-1):
+        features_train, labels_train = smote.fit_sample(features_train, labels_train)
+    print(features_train.shape)
+    print(features_test.shape)
+
+print('after minority sampling :\n' + str(cat_count(labels_train)))
 
 # Finally we export and save our train and test data with pickle in the Folder Data
 
