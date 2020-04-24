@@ -13,6 +13,7 @@ files.remove('SEQ.py')
 files.remove('MNB.py')
 files.remove('RF.py')
 files.remove('GBM.py')
+files.remove('KNN.py')
 
 # run all the scripts one after another
 for script in files:

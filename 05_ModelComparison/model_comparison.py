@@ -1,6 +1,6 @@
 import pickle
 import pandas as pd
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, f1_score
 
 
 def create_table(models, model_names):
@@ -8,15 +8,23 @@ def create_table(models, model_names):
     table['Name'] = model_names
     training_accuracies = []
     test_accuracies = []
+    f1_weigthed = []
+    f1_macro = []
     for model in models:
         pred_train = model.predict(features_train)
         pred_test = model.predict(features_test)
         accuracy_train = round(accuracy_score(labels_train, pred_train)*100, 2)
         accuracy_test = round(accuracy_score(labels_test, pred_test)*100, 2)
+        f1_weighted_test = round(f1_score(labels_test, pred_test, average='weighted') * 100, 2)
+        f1_macro_test = round(f1_score(labels_test, pred_test, average='macro') * 100, 2)
+        f1_weigthed.append(f1_weighted_test)
+        f1_macro.append(f1_macro_test)
         training_accuracies.append(accuracy_train)
         test_accuracies.append(accuracy_test)
     table['Accuracy Training'] = training_accuracies
     table['Accuracy Test'] = test_accuracies
+    table['F1_weighted Test'] = f1_weigthed
+    table['F1_macro Test'] = f1_macro
     return table
 
 
@@ -52,6 +60,9 @@ with open(path_data2 + 'features_test.pickle', 'rb') as data:
 classifiers = [gbm, knn, mnb, rf, svm, nn]
 classifiers_name = ['GradientBoost', 'NearestNeighbour', 'MultinomBayes', 'RandomForest', 'SupportVector',
                     'Multiperceptron']
+
+classifiers = [svm, nn]
+classifiers_name = ['SupportVector', 'Multiperceptron']
 
 df_table = create_table(classifiers, classifiers_name)
 df_table_sorted = df_table.sort_values(by='Accuracy Test', ascending=False)

@@ -91,7 +91,7 @@ if crop_95:
 
 # here 80 percent belong to the training set and 20 to the new test set
 words_train, words_test, labels_train, labels_test = train_test_split(df_train['article_words'], df_train['topic_code'],
-                                                                      test_size=0.2, random_state=0)
+                                                                      test_size=500, random_state=0)
 
 # parameters (to be tuned)
 

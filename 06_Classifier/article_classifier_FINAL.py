@@ -89,8 +89,11 @@ classifiers = [gbm, knn, mnb, rf, svm, nn]
 classifiers_name = ['GradientBoost', 'NearestNeighbour', 'MultinomBayes', 'RandomForest', 'SupportVector',
                     'Multiperceptron']
 
+classifiers = [svm, nn]
+classifiers_name = ['SupportVector', 'Multiperceptron']
+
 # show the stats for each categorie for true
-show_stats = 0
+show_stats = 1
 # show the topX of each category
 topX = 10
 
@@ -111,22 +114,22 @@ for classifier in classifiers:
                       'FINAL TEST data set WITHOUT irrelevant articles')
     num += 1
 
-#
-# # UNFILTERED DATA
-# # FINAL test data set WITH irrelevant articles trained with FINAL training set w/o the irrelevant articles
-#
-#
-# # applying the tfidf transform
-# features_test_unfiltered = tfidf_custom.transform(df_test_unfiltered['article_words']).toarray()
-# labels_test_unfiltered = df_test_unfiltered['topic_code']
-#
-# num = 0
-# for classifier in classifiers:
-#     classify_articles(classifier, classifiers_name, num, features_train_filtered, features_test_unfiltered,
-#                       labels_train_filtered, labels_test_unfiltered, show_stats, topX,
-#                       'FINAL TEST data set WITH irrelevant articles')
-#     num += 1
-#
+
+# UNFILTERED DATA
+# FINAL test data set WITH irrelevant articles trained with FINAL training set w/o the irrelevant articles
+
+
+# applying the tfidf transform
+features_test_unfiltered = tfidf_custom.transform(df_test_unfiltered['article_words']).toarray()
+labels_test_unfiltered = df_test_unfiltered['topic_code']
+
+num = 0
+for classifier in classifiers:
+    classify_articles(classifier, classifiers_name, num, features_train_filtered, features_test_unfiltered,
+                      labels_train_filtered, labels_test_unfiltered, show_stats, topX,
+                      'FINAL TEST data set WITH irrelevant articles')
+    num += 1
+
 # # FINAL test data set WITH irrelevant articles trained with FINAL training set WITH the irrelevant articles
 #
 # # fitting the tfidf transform on the whole UNFILTERED train data
@@ -143,94 +146,17 @@ for classifier in classifiers:
 #                       'FINAL TEST data set WITH TRAINED irrelevant articles')
 #     num += 1
 
-# OUTPUT UNTUNED :
+# Results for 1000 unigramms:
 
-# Classifier: GradientBoost accuracy: 75.21 %.
+# SVM:
 #
-# Performance on FINAL TEST data set WITHOUT irrelevant articles.
+# OVERALL RESULT: 69/100.
+# (Performance on FINAL TEST data set WITHOUT irrelevant articles.)
+# OVERALL RESULT: 54/100.
+# (Performance on FINAL TEST data set WITH irrelevant articles.)
+# NN:
 #
-# OVERALL RESULT: 66/100.
-#
-# Classifier: NearestNeighbour accuracy: 74.79 %.
-#
-# Performance on FINAL TEST data set WITHOUT irrelevant articles.
-#
-# OVERALL RESULT: 62/100.
-#
-# Classifier: MultinomBayes accuracy: 72.22 %.
-#
-# Performance on FINAL TEST data set WITHOUT irrelevant articles.
-#
-# OVERALL RESULT: 63/100.
-#
-# Classifier: RandomForest accuracy: 70.51 %.
-#
-# Performance on FINAL TEST data set WITHOUT irrelevant articles.
-#
-# OVERALL RESULT: 65/100.
-#
-# Classifier: SupportVector accuracy: 70.09 %.
-#
-# Performance on FINAL TEST data set WITHOUT irrelevant articles.
-#
-# OVERALL RESULT: 68/100.
-#
-# Classifier: GradientBoost accuracy: 35.2 %.
-#
-# Performance on FINAL TEST data set WITH irrelevant articles.
-#
-# OVERALL RESULT: 47/100.
-#
-# Classifier: NearestNeighbour accuracy: 35.0 %.
-#
-# Performance on FINAL TEST data set WITH irrelevant articles.
-#
-# OVERALL RESULT: 44/100.
-#
-# Classifier: MultinomBayes accuracy: 33.8 %.
-#
-# Performance on FINAL TEST data set WITH irrelevant articles.
-#
-# OVERALL RESULT: 46/100.
-#
-# Classifier: RandomForest accuracy: 33.0 %.
-#
-# Performance on FINAL TEST data set WITH irrelevant articles.
-#
-# OVERALL RESULT: 49/100.
-#
-# Classifier: SupportVector accuracy: 32.8 %.
-#
-# Performance on FINAL TEST data set WITH irrelevant articles.
-#
-# OVERALL RESULT: 48/100.
-#
-# Classifier: GradientBoost accuracy: 73.8 %.
-#
-# Performance on FINAL TEST data set WITH TRAINED irrelevant articles.
-#
-# OVERALL RESULT: 58/110.
-#
-# Classifier: NearestNeighbour accuracy: 76.6 %.
-#
-# Performance on FINAL TEST data set WITH TRAINED irrelevant articles.
-#
-# OVERALL RESULT: 58/110.
-#
-# Classifier: MultinomBayes accuracy: 72.4 %.
-#
-# Performance on FINAL TEST data set WITH TRAINED irrelevant articles.
-#
-# OVERALL RESULT: 55/110.
-#
-# Classifier: RandomForest accuracy: 73.0 %.
-#
-# Performance on FINAL TEST data set WITH TRAINED irrelevant articles.
-#
-# OVERALL RESULT: 57/110.
-#
-# Classifier: SupportVector accuracy: 71.6 %.
-#
-# Performance on FINAL TEST data set WITH TRAINED irrelevant articles.
-#
-# OVERALL RESULT: 68/110.
+# OVERALL RESULT: 73/100.
+# (Performance on FINAL TEST data set WITHOUT irrelevant articles.)
+# OVERALL RESULT: 55/100.
+# (Performance on FINAL TEST data set WITH irrelevant articles.)

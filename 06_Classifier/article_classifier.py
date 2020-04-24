@@ -86,15 +86,15 @@ with open(path_data2 + 'df_train_unfiltered.pickle', 'rb') as data:
 with open(path_data2 + 'tfidf_custom.pickle', 'rb') as data:
     tfidf_custom = pickle.load(data)
 
-show_unfiltered_stats = 0
+show_unfiltered_stats = 1
 
 classifiers = [gbm, knn, mnb, rf, svm, nn]
-classifiers = [knn, svm, nn]
+classifiers = [svm, nn]
 classifiers_name = ['GradientBoost', 'NearestNeighbour', 'MultinomBayes', 'RandomForest', 'SupportVector',
                     'Multiperceptron']
 
 # show the stats for each categorie for true
-show_stats = 1
+show_stats = 0
 # show the topX of each category
 topX = 10
 
@@ -115,28 +115,13 @@ for classifier in classifiers:
                       'FINAL TEST data set WITHOUT irrelevant articles')
 
 if show_unfiltered_stats:
-    # get the performance for the test data set from the training data set with the irrelevant articles
-
-    # split the unfiltered test set again (USE SAME test_size AS IN feature_engineering!)
-    # NOTE: of course the unfiltered test set and the filtered test set are not 100 percent matching each other since it
-    # cannot be assumed that the irrelevant articles are randomly distributed over the given Training set!
-    _, words_test_unfiltered, _, labels_test_unfiltered = train_test_split(df_train_unfiltered['article_words'],
-                                                                           df_train_unfiltered['topic_code'],
-                                                                           test_size=0.2, random_state=0)
-
-    # applying the tfidf transform
-    features_test_unfiltered = tfidf_custom.transform(words_test_unfiltered).toarray()
-
-    for classifier in classifiers:
-        classify_articles(classifier, features_test_unfiltered, labels_test_unfiltered, 0,
-                          'TEST data set from TRAINING data WITH irrelevant articles')
 
     # get the performance for the FINAL test data set with the irrelevant articles
     features_final_test_unfilterd = tfidf_custom.transform(df_test_unfiltered['article_words']).toarray()
     labels_final_test_unfilterd = df_test_unfiltered['topic_code']
 
     for classifier in classifiers:
-        classify_articles(classifier, features_final_test_unfilterd, labels_final_test_unfilterd, 0,
+        classify_articles(classifier, features_final_test_unfilterd, labels_final_test_unfilterd, show_stats, topX,
                           'FINAL TEST data set WITH irrelevant articles')
 
 # Results on test set from training set trained WITH Categorie Irrelevant:
@@ -184,3 +169,10 @@ if show_unfiltered_stats:
 # RF =  64/100
 # SVC = 69/100
 # MLP = 69/100
+
+# Results for 1000 unigrams Final test set:
+# SVC = 67/100
+# MLP = 70/100
+# with unfiltered articles in Final set:
+# SVC = 56/100
+# MLP = 53/100

@@ -94,7 +94,7 @@ if calc_tuned_model:
 
 if calc_fixed_model:
     # see default parameters of RF classifier
-    mlp_fixed = Mlp(hidden_layer_sizes=(300,), random_state=0, max_iter=500, solver='adam', learning_rate='constant',
+    mlp_fixed = Mlp(hidden_layer_sizes=(300,), random_state=1, max_iter=500, solver='adam', learning_rate='constant',
                     activation='tanh', alpha=.05)
     # hidden_layer_sizes: The ith element represents the number of neurons in the ith hidden layer.
 
