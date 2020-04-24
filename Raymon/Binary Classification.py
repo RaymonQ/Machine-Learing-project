@@ -29,7 +29,7 @@ df.apply (lambda row: label_relevance(row), axis=1)
 df['relevance'] = df.apply (lambda row: label_relevance(row), axis=1)
 df_test['relevance'] = df.apply (lambda row: label_relevance(row), axis=1)
 X_train = tfidf_custom.fit_transform(df['article_words']).toarray()
-X_test = tfidf_custom.fit_transform(df_test['article_words']).toarray()
+X_test = tfidf_custom.transform(df_test['article_words']).toarray()
 y_train = df['relevance']
 y_test = df_test['relevance']
 
