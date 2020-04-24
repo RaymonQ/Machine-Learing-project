@@ -204,3 +204,5 @@ if calc_fixed_model:
 # 1000 unigrams unbalanced
 # The accuracy of fixed SVC on the TRAIN set is: 88.75 %.
 # The accuracy of fixed SVC on the TEST is: 76.21 %.
+
+# 1000 unigrams balanced

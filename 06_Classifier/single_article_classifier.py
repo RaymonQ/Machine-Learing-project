@@ -92,7 +92,7 @@ classifiers = [gbm, knn, mnb, rf, svm, nn]
 classifiers_name = ['GradientBoost', 'NearestNeighbour', 'MultinomBayes', 'RandomForest', 'SupportVector',
                     'Multiperceptron']
 
-classifier = nn
+classifier = svm
 # show the stats for each categorie for true
 show_stats = 1
 # show the topX of each category

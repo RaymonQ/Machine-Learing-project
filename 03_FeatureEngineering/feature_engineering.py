@@ -126,6 +126,10 @@ if minoritySampling:
         features_train, labels_train = smote.fit_sample(features_train, labels_train)
     print(features_train.shape)
     print(features_test.shape)
+    print('after minority sampling :\n' + str(cat_count(labels_train)))
+    features_train, _, labels_train, _ = train_test_split(features_train, labels_train, test_size=0.7, random_state=0)
+    print(features_train.shape)
+    print(features_test.shape)
 
 print('after minority sampling :\n' + str(cat_count(labels_train)))
 

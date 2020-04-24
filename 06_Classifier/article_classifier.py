@@ -89,6 +89,7 @@ with open(path_data2 + 'tfidf_custom.pickle', 'rb') as data:
 show_unfiltered_stats = 0
 
 classifiers = [gbm, knn, mnb, rf, svm, nn]
+classifiers = [knn, svm, nn]
 classifiers_name = ['GradientBoost', 'NearestNeighbour', 'MultinomBayes', 'RandomForest', 'SupportVector',
                     'Multiperceptron']
 

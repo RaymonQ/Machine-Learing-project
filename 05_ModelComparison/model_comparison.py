@@ -78,3 +78,22 @@ with open('df_table_sorted.pickle', 'wb') as output:
 # 0     GradientBoost              98.58          75.16
 # 3      RandomForest              98.56          74.63
 # 2     MultinomBayes              78.83          74.00
+
+# Output for 1000 features
+#                Name  Accuracy Training  Accuracy Test
+# 0     GradientBoost              98.58          76.31
+# 4     SupportVector              82.48          76.10
+# 5   Multiperceptron              92.81          76.00
+# 1  NearestNeighbour              80.19          75.47
+# 3      RandomForest              98.56          74.63
+# 2     MultinomBayes              78.83          74.00
+
+# Output for 1000 features with balancing classes
+#
+#                Name  Accuracy Training  Accuracy Test
+# 0     GradientBoost              99.85          75.89
+# 5   Multiperceptron              99.55          74.95
+# 4     SupportVector              96.75          74.84
+# 3      RandomForest              99.85          74.63
+# 2     MultinomBayes              90.22          74.21
+# 1  NearestNeighbour              90.00          64.15
