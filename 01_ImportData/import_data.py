@@ -4,7 +4,9 @@ import pickle
 
 # specify your directory where the project is here
 # path Yannick:
-path_project = "/Users/yannickschnider/PycharmProjects/COMP9417-Group-Assignment/"
+path_project = "/Users/TalWe/.vscode/COMP9417 Group Assignment/COMP9417-Group-Assignment/"
+#"/Users/yannickschnider/PycharmProjects/COMP9417-Group-Assignment/"
+
 # extended paths to the .csv files
 path_trainingData = path_project + '00_TaskHandout/training.csv'
 path_testData = path_project + '00_TaskHandout/test.csv'
@@ -15,7 +17,7 @@ df_test = pd.read_csv(path_testData, sep=',')
 
 # print the first 5 entries of each to check on the imported data
 print(df_train.head(5))
-print(df_train.head(5))
+print(df_test.head(5))
 
 
 # save the frames as pandas data frames using pickle so they can later be easily used by other python-programmes
