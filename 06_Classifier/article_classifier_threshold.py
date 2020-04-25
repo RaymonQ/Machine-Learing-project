@@ -106,9 +106,9 @@ with open(path_data3 + 'df_test_predicted_relevant.pickle', 'rb') as data:
 
 # 1 == NN, 0 == SVM
 modelselection = 1
-show_filtered_results = 0
+show_filtered_results = 1
 show_unfiltered_results = 0
-show_final_results = 1
+show_final_results = 0
 # show the stats for each categorie for true
 show_stats = 1
 # show the topX of each category
