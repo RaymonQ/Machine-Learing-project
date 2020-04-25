@@ -89,9 +89,9 @@ if fit_grid_search:
     grid_search.fit(features_train, labels_train)
     end_time = time.process_time() - start_time
 
-logit_best_grid = grid_search.best_estimator_
-predicted_classes_train = logit_best_grid.predict(features_train)
-predicted_classes_test = logit_best_grid.predict(X_test_final)
+    logit_best_grid = grid_search.best_estimator_
+    predicted_classes_train = logit_best_grid.predict(features_train)
+    predicted_classes_test = logit_best_grid.predict(X_test_final)
 
 
 '''# Train Validation Split on Training Data to apply Cross Validation to
@@ -139,6 +139,25 @@ df_test_predicted_relevant = df_test[df_test['prediction'] == 1]
 
 # Remove relevance and prediction columns (as they're redundant for next part of classification)
 df_test_predicted_relevant = df_test_predicted_relevant.drop(columns=["relevance", "prediction"])
+
+print(df_test_predicted_relevant.head())
+
+# creating a ditionary with the labels
+codes_categories = {'ARTS CULTURE ENTERTAINMENT': 0,
+                    'BIOGRAPHIES PERSONALITIES PEOPLE': 1,
+                    'DEFENCE': 2,
+                    'DOMESTIC MARKETS': 3,
+                    'FOREX MARKETS': 4,
+                    'HEALTH': 5,
+                    'MONEY MARKETS': 6,
+                    'SCIENCE AND TECHNOLOGY': 7,
+                    'SHARE LISTINGS': 8,
+                    'SPORTS': 9,
+                    'IRRELEVANT': 10}
+
+# mapping and creating a new column 'topic_code'
+df_test_predicted_relevant['topic_code'] = df_test_predicted_relevant['topic']
+df_test_predicted_relevant = df_test_predicted_relevant.replace({'topic_code': codes_categories})
 
 print(df_test_predicted_relevant.head())
 

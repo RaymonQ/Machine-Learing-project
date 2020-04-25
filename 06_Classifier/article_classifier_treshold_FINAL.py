@@ -72,6 +72,7 @@ path_project = "/Users/yannickschnider/PycharmProjects/COMP9417-Group-Assignment
 # importing objects from folder data in feature engineering
 path_data = path_project + '04_ModelTraining/Models/'
 path_data2 = path_project + '03_FeatureEngineering/Data/'
+path_data3 = path_project + 'Raymon/'
 
 with open(path_data + 'GBM.pickle', 'rb') as data:
     gbm = pickle.load(data)
@@ -95,6 +96,8 @@ with open(path_data2 + 'df_train_unfiltered.pickle', 'rb') as data:
     df_train_unfiltered = pickle.load(data)
 with open(path_data2 + 'tfidf_custom.pickle', 'rb') as data:
     tfidf_custom = pickle.load(data)
+with open(path_data3 + 'df_test_predicted_relevant.pickle', 'rb') as data:
+    df_test_predicted_relevant = pickle.load(data)
 
 classifiers = [gbm, knn, mnb, rf, svm, nn]
 classifiers_name = ['GradientBoost', 'NearestNeighbour', 'MultinomBayes', 'RandomForest', 'SupportVector',
@@ -102,7 +105,9 @@ classifiers_name = ['GradientBoost', 'NearestNeighbour', 'MultinomBayes', 'Rando
 
 # 1 == NN, 0 == SVM
 modelselection = 1
-show_unfiltered_stats = 0
+show_filtered_results = 0
+show_unfiltered_results = 0
+show_final_results = 1
 # show the stats for each categorie for true
 show_stats = 1
 # show the topX of each category
@@ -124,29 +129,32 @@ else:
     thresholds = [0.65, 0.7, 0.9, 0.9, 0.63, 0.8, 0.94, 0.9, 0.9, 0.97]
     thresholds = [i * threshold_multiplier for i in thresholds]
 
+if show_filtered_results:
+    # FILTERED DATA
+    # FINAL test data set w/o irrelevant articles trained with FINAL training set w/o the irrelevant articles
 
-# FILTERED DATA
-# FINAL test data set w/o irrelevant articles trained with FINAL training set w/o the irrelevant articles
+    # fitting the tfidf transform on the whole train data
+    features_train_filtered = tfidf_custom.fit_transform(df_train['article_words']).toarray()
+    # applying the tfidf transform
+    features_test_filtered = tfidf_custom.transform(df_test['article_words']).toarray()
+    labels_train_filtered = df_train['topic_code']
+    labels_test_filtered = df_test['topic_code']
 
-# fitting the tfidf transform on the whole train data
-features_train_filtered = tfidf_custom.fit_transform(df_train['article_words']).toarray()
-# applying the tfidf transform
-features_test_filtered = tfidf_custom.transform(df_test['article_words']).toarray()
-labels_train_filtered = df_train['topic_code']
-labels_test_filtered = df_test['topic_code']
-
-num = 0
-for classifier in classifiers:
-    classify_articles(classifier, classifiers_name, num, features_train_filtered, features_test_filtered,
-                      labels_train_filtered, labels_test_filtered, show_stats, topX, thresholds,
-                      'FINAL TEST data set WITHOUT irrelevant articles')
-    num += 1
+    num = 0
+    for classifier in classifiers:
+        classify_articles(classifier, classifiers_name, num, features_train_filtered, features_test_filtered,
+                          labels_train_filtered, labels_test_filtered, show_stats, topX, thresholds,
+                          'FINAL TEST data set WITHOUT irrelevant articles')
+        num += 1
 
 
-if show_unfiltered_stats:
+if show_unfiltered_results:
     # UNFILTERED DATA
     # FINAL test data set WITH irrelevant articles trained with FINAL training set w/o the irrelevant articles
 
+    # fitting the tfidf transform on the whole train data
+    features_train_filtered = tfidf_custom.fit_transform(df_train['article_words']).toarray()
+    labels_train_filtered = df_train['topic_code']
     # applying the tfidf transform
     features_test_unfiltered = tfidf_custom.transform(df_test_unfiltered['article_words']).toarray()
     labels_test_unfiltered = df_test_unfiltered['topic_code']
@@ -156,5 +164,21 @@ if show_unfiltered_stats:
         classify_articles(classifier, classifiers_name, num, features_train_filtered, features_test_unfiltered,
                           labels_train_filtered, labels_test_unfiltered, show_stats, topX, thresholds,
                           'FINAL TEST data set WITH irrelevant articles')
+        num += 1
+
+if show_final_results:
+    # Final TEST DATA from Binary classification
+    # fitting the tfidf transform on the whole train data
+    features_train_filtered = tfidf_custom.fit_transform(df_train['article_words']).toarray()
+    # applying the tfidf transform
+    features_test_filtered = tfidf_custom.transform(df_test_predicted_relevant['article_words']).toarray()
+    labels_train_filtered = df_train['topic_code']
+    labels_test_filtered = df_test_predicted_relevant['topic_code']
+
+    num = 0
+    for classifier in classifiers:
+        classify_articles(classifier, classifiers_name, num, features_train_filtered, features_test_filtered,
+                          labels_train_filtered, labels_test_filtered, show_stats, topX, thresholds,
+                          'FINAL TEST data set with binary classification')
         num += 1
 
