@@ -12,10 +12,11 @@ from sklearn.feature_extraction.text import TfidfVectorizer as TfIdf
 ngram_range = (1, 1)
 min_df = 10
 max_df = 1.
-max_features = 300
+max_features = 2000
 sublinear_tf = True
+stop_words = None
 tfidf_custom = TfIdf(ngram_range=ngram_range, max_df=max_df, min_df=min_df, max_features=max_features,
-                     sublinear_tf=sublinear_tf)
+                     sublinear_tf=sublinear_tf, stop_words = stop_words)
 
 topic_codes = {
     'IRRELEVANT': 0,
