@@ -1,4 +1,5 @@
 import pandas as pd
+import pickle
 # read data
 path_project = "/Users/chengqian/Desktop/COMP9417-Group-Assignment/"
 path_trainingData = path_project + '00_TaskHandout/training.csv'
@@ -59,6 +60,11 @@ print(confusion_matrix)
 # Results
 from sklearn.metrics import classification_report
 print(classification_report(y_test, prediction))
+
+
+# Save Logistic Regression model in Pickle file
+with open(path_project + 'Raymon/binaryModel.pickle', 'wb') as output:
+    pickle.dump(logit_model, output)
 
 
 import numpy as np
