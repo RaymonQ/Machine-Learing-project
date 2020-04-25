@@ -11,14 +11,11 @@ from sklearn.metrics import confusion_matrix
 from sklearn.metrics import classification_report
 
 
+path_project = "/Users/TalWe/.vscode/COMP9417 Group Assignment/COMP9417-Group-Assignment/"
 
 # read data
-path_project = "/Users/chengqian/Desktop/COMP9417-Group-Assignment/"
-path_trainingData = path_project + '00_TaskHandout/training.csv'
-path_testData = path_project + '00_TaskHandout/test.csv'
-
-df = pd.read_csv(path_trainingData, sep=',')
-df_test = pd.read_csv(path_testData, sep=',')
+df = pd.read_csv("training.csv")
+df_test = pd.read_csv("test.csv")
 
 #TfIdf settings
 ngram_range = (1, 1)
@@ -93,7 +90,13 @@ print(cnf_matrix)
 # Results
 print(classification_report(y_test_final, prediction))
 
+# Filter Test Data to only include articles that were prediction relevant by logistic model function
+df_test['prediction'] = prediction
+df_test_predicted_relevant = df_test[df_test['prediction'] == 1]
+
+# Remove relevance and prediction columns (as they're redundant for next part of classification)
+df_test_predicted_relevant = df_test_predicted_relevant.drop(columns=["relevance","prediction"])
 
 # Save Logistic Regression model in Pickle file
-with open(path_project + 'Raymon/binaryModel.pickle', 'wb') as output:
-    pickle.dump(logit_model, output)
+with open(path_project + 'Raymon/df_test_predicted_relevant.pickle', 'wb') as output:
+    pickle.dump(df_test_predicted_relevant, output)
