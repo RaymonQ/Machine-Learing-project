@@ -1,11 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import plot_confusion_matrix
+import pickle
 
 
 # specify your directory where the project is here
 # path Tal:
-path_project = "/Users/TalWe/.vscode/COMP9417 Group Assignment/COMP9417-Group-Assignment/"
+# path_project = "/Users/TalWe/.vscode/COMP9417 Group Assignment/COMP9417-Group-Assignment/"
+path_project = "/Users/yannickschnider/PycharmProjects/COMP9417-Group-Assignment/"
+
 
 # specify the data you want to create confusion matrix for (x_test and y_test)
 X_path = path_project + '03_FeatureEngineering/Data/final_features_test.pickle'
@@ -38,7 +41,7 @@ title = "Confusion Matrix for NN Classifier"
 cfm_disp = plot_confusion_matrix(classifier, X_input, y_target,
                                  display_labels=class_names,
                                  cmap=plt.cm.Blues,
-                                 normalize=True)
+                                 normalize='true', xticks_rotation=90)
 
 cfm_disp.ax_.set_title(title)
 
