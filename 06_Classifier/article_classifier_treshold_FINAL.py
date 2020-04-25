@@ -104,10 +104,10 @@ classifiers_name = ['GradientBoost', 'NearestNeighbour', 'MultinomBayes', 'Rando
                     'Multiperceptron']
 
 # 1 == NN, 0 == SVM
-modelselection = 1
+modelselection = 0
 show_filtered_results = 0
-show_unfiltered_results = 0
-show_final_results = 1
+show_unfiltered_results = 1
+show_final_results = 0
 # show the stats for each categorie for true
 show_stats = 1
 # show the topX of each category
