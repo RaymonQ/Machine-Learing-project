@@ -6,7 +6,7 @@ def sort_probs(probs, cat):
     return probs.sort_values(by=cat, ascending=False)[[cat, 'topic_code']]
 
 
-def classify_articles(model, features, labels, stats, topx, dataset):
+def classify_articles(model, features, labels, stats, topx, threshold, dataset):
     print('\nClassifier: ' + str(model) + '\n')
     print('Performance on ' + dataset + '.\n')
     probab_test = model.predict_proba(features)
@@ -31,17 +31,28 @@ def classify_articles(model, features, labels, stats, topx, dataset):
     inv_code_categories = {v: k for k, v in codes_categories.items()}
 
     overall_hits = 0
+    overall_hits_sug = 0
+    overall_suggestions = 0
     for i in range(probab_test.shape[1]):
         column = "p" + str(i)
         top_x = sort_probs(df_proba, column).head(topx)
+        suggestions_index = top_x[column] > threshold[i]
+        suggestions = top_x[suggestions_index]
+        overall_suggestions += suggestions.shape[0]
         hits = top_x['topic_code'] == i
         overall_hits += hits.astype(int).sum()
+        hits_sug = suggestions['topic_code'] == i
+        overall_hits_sug += hits_sug.astype(int).sum()
         if stats:
             print(top_x)
             print('\nCategory ' + inv_code_categories[i] + ': ' + str(hits.astype(int).sum()) + '/' + str(topx) +
                   '.\n\n')
+            print(suggestions)
+            print('\nCategory ' + inv_code_categories[i] + ' Suggestions: ' + str(hits_sug.astype(int).sum()) + '/' +
+                  str(suggestions.shape[0]) + '.\n\n')
 
     print('OVERALL RESULT: ' + str(overall_hits) + '/' + str(int(probab_test.shape[1])*topx) + ".")
+    print('OVERALL SUGGESTIONS : ' + str(overall_hits_sug) + '/' + str(overall_suggestions) + ".")
     if stats:
         print('(Performance on ' + dataset + '.)\n')
 
@@ -85,21 +96,37 @@ with open(path_data2 + 'df_train_unfiltered.pickle', 'rb') as data:
 with open(path_data2 + 'tfidf_custom.pickle', 'rb') as data:
     tfidf_custom = pickle.load(data)
 
+
+# classifiers = [gbm, knn, mnb, rf, svm, nn]
+# classifiers_name = ['GradientBoost', 'NearestNeighbour', 'MultinomBayes', 'RandomForest', 'SupportVector',
+#                     'Multiperceptron']
+
+# 1 == NN, 0 == SVM
+modelselection = 1
 show_unfiltered_stats = 0
-
-classifiers = [gbm, knn, mnb, rf, svm, nn]
-classifiers = [svm, nn]
-classifiers_name = ['GradientBoost', 'NearestNeighbour', 'MultinomBayes', 'RandomForest', 'SupportVector',
-                    'Multiperceptron']
-
 # show the stats for each categorie for true
 show_stats = 1
 # show the topX of each category
 topX = 10
+# make the threshold less agressive with a smaller number (range = [0,1])
+threshold_multiplier = .9
+
+if modelselection:
+    classifiers = [nn]
+    classifiers_name = ['Multiperceptron']
+    # custom fit for NN
+    thresholds = [0.83, 0.8, 0.9, 0.9, 0.987, 0.93, 0.98, 0.7, 0.9, 0.97]
+    thresholds = [i * threshold_multiplier for i in thresholds]
+else:
+    classifiers = [svm]
+    classifiers_name = ['SupportVector']
+    # custom fit for SVM
+    thresholds = [0.65, 0.7, 0.9, 0.9, 0.63, 0.8, 0.94, 0.9, 0.9, 0.97]
+    thresholds = [i * threshold_multiplier for i in thresholds]
 
 # get the performance for the test data set from the training data set w/o irrelevant articles
 for classifier in classifiers:
-    classify_articles(classifier, features_test, labels_test, show_stats, topX,
+    classify_articles(classifier, features_test, labels_test, show_stats, topX, thresholds,
                       'TEST data SET from TRAINING data WITHOUT irrelevant articles')
 
 
@@ -110,7 +137,7 @@ features_final_test = tfidf_custom.transform(df_test['article_words']).toarray()
 labels_final_test = df_test['topic_code']
 
 for classifier in classifiers:
-    classify_articles(classifier, features_final_test, labels_final_test, show_stats, topX,
+    classify_articles(classifier, features_final_test, labels_final_test, show_stats, topX, thresholds,
                       'FINAL TEST data set WITHOUT irrelevant articles')
 
 if show_unfiltered_stats:
@@ -122,56 +149,3 @@ if show_unfiltered_stats:
     for classifier in classifiers:
         classify_articles(classifier, features_final_test_unfilterd, labels_final_test_unfilterd, show_stats, topX,
                           'FINAL TEST data set WITH irrelevant articles')
-
-# Results on test set from training set trained WITH Categorie Irrelevant:
-# GBM = 73/110
-# Knn = 75/110
-# MNB = 73/110
-# RF =  71/110
-# SVC = 84/110
-
-# Results on FINAL test trained WITH Categorie Irrelevant:
-# GBM = 52/110
-# Knn = 56/110
-# MNB = 54/110
-# RF =  56/110
-# SVC = 62/110
-
-
-# Results on FINAL test trained WITHOUT Categorie Irrelevant:
-# GBM = 47/100
-# Knn = 42/100
-# MNB = 45/100
-# RF =  47/100
-# SVC = 51/100
-
-# Results 2000 features, on final test set:
-# GBM = 67/100
-# Knn = 65/100
-# MNB = 68/100
-# RF =  66/100
-# SVC = 70/100
-# MLP = 70/100
-
-# Results 1000 features, on final test set:
-# GBM = 70/100
-# Knn = 66/100
-# MNB = 67/100
-# RF =  64/100
-# SVC = 69/100
-# MLP = 71/100
-
-# Results 1000 features, on final test set with 95 quantile:
-# GBM = 66/100
-# Knn = 61/100
-# MNB = 66/100
-# RF =  64/100
-# SVC = 69/100
-# MLP = 69/100
-
-# Results for 1000 unigrams Final test set:
-# SVC = 67/100
-# MLP = 70/100
-# with unfiltered articles in Final set:
-# SVC = 56/100
-# MLP = 53/100
