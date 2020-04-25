@@ -39,54 +39,54 @@ df = df.replace({'relevance':topic_codes})
 df_test['relevance'] = df_test['topic']
 df_test = df_test.replace({'relevance':topic_codes})
 
-X_train = tfidf_custom.fit_transform(df['article_words']).toarray()
-X_test = tfidf_custom.transform(df_test['article_words']).toarray()
-y_train = df['relevance']
-y_test = df_test['relevance']
+# Fit TFIDF to Train Features, only apply transform to Test input
+features_train = tfidf_custom.fit_transform(df['article_words']).toarray()
+X_test_final = tfidf_custom.transform(df_test['article_words']).toarray()
+labels_train = df['relevance']
+y_test_final = df_test['relevance']
 
 
 
-# real test data
+# Train Validation Split on Training Data to apply Cross Validation to
+from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
-logit_model = LogisticRegression()
-# Fit model 
-logit_model = logit_model.fit(X_train, y_train)
-
-prediction = logit_model.predict(X_test)
-# Confusion metrics
 from sklearn.metrics import confusion_matrix
-confusion_matrix = confusion_matrix(y_test, prediction)
-print(confusion_matrix)
-# Results
 from sklearn.metrics import classification_report
-print(classification_report(y_test, prediction))
+
+for i in range(10):
+    X_train,X_test,y_train,y_test=train_test_split(features_train,labels_train,test_size=0.20,random_state=None)
+
+    # Validation test data
+    logit_model = LogisticRegression()
+
+    # Fit model 
+    logit_model = logit_model.fit(X_train, y_train)
+    prediction = logit_model.predict(X_test)
+    
+    # Confusion metrics
+    cnf_matrix = confusion_matrix(y_test, prediction)
+    print(cnf_matrix)
+    
+    # Results
+    
+    print(classification_report(y_test, prediction))
+
+
+# Real test data
+logit_model = LogisticRegression()
+
+# Fit model 
+logit_model = logit_model.fit(features_train, labels_train)
+prediction = logit_model.predict(X_test_final)
+
+# Confusion metrics
+cnf_matrix = confusion_matrix(y_test_final, prediction)
+print(cnf_matrix)
+
+# Results
+print(classification_report(y_test_final, prediction))
 
 
 # Save Logistic Regression model in Pickle file
 with open(path_project + 'Raymon/binaryModel.pickle', 'wb') as output:
     pickle.dump(logit_model, output)
-
-
-import numpy as np
-np.count_nonzero(prediction=='0')
-
-
-
-# test data generated from training data
-#Split traing and test data
-from sklearn.model_selection import train_test_split
-X_train,X_test,y_train,y_test=train_test_split(X_train,y_train,test_size=0.20,random_state=0)
-from sklearn.linear_model import LogisticRegression
-logit_model = LogisticRegression()
-# Fit model 
-logit_model = logit_model.fit(X_train, y_train)
-
-prediction = logit_model.predict(X_test)
-# Confusion metrics
-from sklearn.metrics import confusion_matrix
-confusion_matrix = confusion_matrix(y_test, prediction)
-print(confusion_matrix)
-# Results
-from sklearn.metrics import classification_report
-print(classification_report(y_test, prediction))
-
