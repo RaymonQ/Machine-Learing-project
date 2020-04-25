@@ -17,17 +17,26 @@ sublinear_tf = True
 tfidf_custom = TfIdf(ngram_range=ngram_range, max_df=max_df, min_df=min_df, max_features=max_features,
                      sublinear_tf=sublinear_tf)
 
-#Create "relevance" label
-def label_relevance (row):
-   if row['topic'] == 'IRRELEVANT' :
-      return '0'
-   else:
-      return '1'
+topic_codes = {
+    'IRRELEVANT': 0,
+    'ARTS CULTURE ENTERTAINMENT': 1,
+    'BIOGRAPHIES PERSONALITIES PEOPLE': 1,
+    'DEFENCE': 1,
+    'DOMESTIC MARKETS': 1,
+    'FOREX MARKETS': 1,
+    'HEALTH': 1,
+    'MONEY MARKETS': 1,
+    'SCIENCE AND TECHNOLOGY': 1,
+    'SHARE LISTINGS': 1,
+    'SPORTS': 1,   
+}
 
-#Add "relevance" label
-df.apply (lambda row: label_relevance(row), axis=1)
-df['relevance'] = df.apply (lambda row: label_relevance(row), axis=1)
-df_test['relevance'] = df.apply (lambda row: label_relevance(row), axis=1)
+df['relevance'] = df['topic']
+df = df.replace({'relevance':topic_codes})
+
+df_test['relevance'] = df_test['topic']
+df_test = df_test.replace({'relevance':topic_codes})
+
 X_train = tfidf_custom.fit_transform(df['article_words']).toarray()
 X_test = tfidf_custom.transform(df_test['article_words']).toarray()
 y_train = df['relevance']
