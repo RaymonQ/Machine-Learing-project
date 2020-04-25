@@ -2,16 +2,19 @@ import pickle
 
 import pandas as pd
 
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV, ShuffleSplit
 from sklearn.linear_model import LogisticRegression
+import time
 
 from sklearn.feature_extraction.text import TfidfVectorizer as TfIdf
 
-from sklearn.metrics import confusion_matrix
-from sklearn.metrics import classification_report
+from sklearn.metrics import confusion_matrix, classification_report
 
+# Decide if to implement grid search or not
+fit_grid_search = 0
 
-# path_project = "/Users/TalWe/.vscode/COMP9417 Group Assignment/COMP9417-Group-Assignment/"
+# Specify Path Project
+#path_project = "/Users/TalWe/.vscode/COMP9417 Group Assignment/COMP9417-Group-Assignment/"
 path_project = "/Users/yannickschnider/PycharmProjects/COMP9417-Group-Assignment/"
 
 # read data
@@ -55,7 +58,43 @@ labels_train = df['relevance']
 y_test_final = df_test['relevance']
 
 
-# Train Validation Split on Training Data to apply Cross Validation to
+# IMPLEMENT CROSS VALIDATION FOR TUNING LOGISTIC REGRESSION HYPERPARAMETERS
+if fit_grid_search:
+    # parameter grid based on output random search
+    multiclass = ['ovr']
+    n_jobs = [-1]
+    max_iter = [100,200,300,500]
+
+    param_grid = [
+        {'penalty': ['l2'], 'multi_class': multiclass, 'solver': ['newton-cg','sag','lbfgs'], 'n_jobs': n_jobs, 'max_iter': max_iter},
+        {'penalty': ['elasticnet'], 'multi_class': multiclass, 'solver': ['saga'], 'n_jobs': n_jobs, 'max_iter': max_iter},
+        {'penalty': ['l1'], 'multi_class': multiclass, 'solver': ['liblinear','saga'], 'n_jobs': n_jobs, 'max_iter': max_iter}
+    ]
+
+    # Create a base model
+    logit_model = LogisticRegression()
+
+    # splits in CV with random state
+    cv_sets = ShuffleSplit(n_splits=5, test_size=.2, random_state=0)
+
+    # Instantiate the grid search model
+    start_time = time.process_time()
+    grid_search = GridSearchCV(estimator=logit_model,
+                               param_grid=param_grid,
+                               scoring='accuracy',
+                               cv=cv_sets,
+                               verbose=0)
+
+    # Fit the grid search to the data
+    grid_search.fit(features_train, labels_train)
+    end_time = time.process_time() - start_time
+
+logit_best_grid = grid_search.best_estimator_
+predicted_classes_train = logit_best_grid.predict(features_train)
+predicted_classes_test = logit_best_grid.predict(X_test_final)
+
+
+'''# Train Validation Split on Training Data to apply Cross Validation to
 
 for i in range(10):
     X_train, X_test, y_train, y_test = train_test_split(features_train, labels_train, test_size=0.20, random_state=None)
@@ -74,10 +113,14 @@ for i in range(10):
     # Results
     
     print(classification_report(y_test, prediction))
-
+'''
 
 # Real test data
-logit_model = LogisticRegression()
+# parameters chosen from Cross Validation
+logit_model = LogisticRegression(C=1.0, class_weight=None, dual=False, fit_intercept=True,
+          intercept_scaling=1, max_iter=100, multi_class='ovr', n_jobs=-1,
+          penalty='l2', random_state=None, solver='sag', tol=0.0001,
+          verbose=0, warm_start=False)
 
 # Fit model 
 logit_model = logit_model.fit(features_train, labels_train)
