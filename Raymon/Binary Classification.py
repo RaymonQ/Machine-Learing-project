@@ -1,5 +1,17 @@
-import pandas as pd
 import pickle
+
+import pandas as pd
+
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+
+from sklearn.feature_extraction.text import TfidfVectorizer as TfIdf
+
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import classification_report
+
+
+
 # read data
 path_project = "/Users/chengqian/Desktop/COMP9417-Group-Assignment/"
 path_trainingData = path_project + '00_TaskHandout/training.csv'
@@ -9,7 +21,6 @@ df = pd.read_csv(path_trainingData, sep=',')
 df_test = pd.read_csv(path_testData, sep=',')
 
 #TfIdf settings
-from sklearn.feature_extraction.text import TfidfVectorizer as TfIdf
 ngram_range = (1, 1)
 min_df = 10
 max_df = 1.
@@ -48,10 +59,6 @@ y_test_final = df_test['relevance']
 
 
 # Train Validation Split on Training Data to apply Cross Validation to
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import confusion_matrix
-from sklearn.metrics import classification_report
 
 for i in range(10):
     X_train,X_test,y_train,y_test=train_test_split(features_train,labels_train,test_size=0.20,random_state=None)
