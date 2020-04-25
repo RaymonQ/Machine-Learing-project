@@ -11,11 +11,12 @@ from sklearn.metrics import confusion_matrix
 from sklearn.metrics import classification_report
 
 
-path_project = "/Users/TalWe/.vscode/COMP9417 Group Assignment/COMP9417-Group-Assignment/"
+# path_project = "/Users/TalWe/.vscode/COMP9417 Group Assignment/COMP9417-Group-Assignment/"
+path_project = "/Users/yannickschnider/PycharmProjects/COMP9417-Group-Assignment/"
 
 # read data
-df = pd.read_csv("training.csv")
-df_test = pd.read_csv("test.csv")
+df = pd.read_csv(path_project + "00_TaskHandout/training.csv", sep=',')
+df_test = pd.read_csv(path_project + "00_TaskHandout/test.csv", sep=',')
 
 #TfIdf settings
 ngram_range = (1, 1)
@@ -54,11 +55,10 @@ labels_train = df['relevance']
 y_test_final = df_test['relevance']
 
 
-
 # Train Validation Split on Training Data to apply Cross Validation to
 
 for i in range(10):
-    X_train,X_test,y_train,y_test=train_test_split(features_train,labels_train,test_size=0.20,random_state=None)
+    X_train, X_test, y_train, y_test = train_test_split(features_train, labels_train, test_size=0.20, random_state=None)
 
     # Validation test data
     logit_model = LogisticRegression()
@@ -95,8 +95,10 @@ df_test['prediction'] = prediction
 df_test_predicted_relevant = df_test[df_test['prediction'] == 1]
 
 # Remove relevance and prediction columns (as they're redundant for next part of classification)
-df_test_predicted_relevant = df_test_predicted_relevant.drop(columns=["relevance","prediction"])
+df_test_predicted_relevant = df_test_predicted_relevant.drop(columns=["relevance", "prediction"])
+
+print(df_test_predicted_relevant.head())
 
 # Save Logistic Regression model in Pickle file
-with open(path_project + 'Raymon/df_test_predicted_relevant.pickle', 'wb') as output:
+with open('df_test_predicted_relevant.pickle', 'wb') as output:
     pickle.dump(df_test_predicted_relevant, output)
