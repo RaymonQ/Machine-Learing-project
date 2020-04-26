@@ -46,10 +46,17 @@ topic_codes = {
 }
 
 df['relevance'] = df['topic']
-df = df.replace({'relevance':topic_codes})
+df = df.replace({'relevance': topic_codes})
 
 df_test['relevance'] = df_test['topic']
-df_test = df_test.replace({'relevance':topic_codes})
+df_test = df_test.replace({'relevance': topic_codes})
+
+# here valdiation set split
+df_train, df_val = train_test_split(df, test_size=500, random_state=0)
+Xtr = tfidf_custom.fit_transform(df_train['article_words']).toarray()
+Xval = tfidf_custom.transform(df_val['article_words']).toarray()
+Ytr = df_train['relevance']
+Yval = df_val['relevance']
 
 # Fit TFIDF to Train Features, only apply transform to Test input
 features_train = tfidf_custom.fit_transform(df['article_words']).toarray()
@@ -126,21 +133,36 @@ logit_model = LogisticRegression(C=1.0, class_weight=None, dual=False, fit_inter
 logit_model = logit_model.fit(features_train, labels_train)
 prediction = logit_model.predict(X_test_final)
 
+logit_model_val = logit_model.fit(Xtr,Ytr)
+pred_val = logit_model.predict(Xval)
+
 # Confusion metrics
 cnf_matrix = confusion_matrix(y_test_final, prediction)
+cnf_matrix_val = confusion_matrix(Yval, pred_val)
 print(cnf_matrix)
+print(cnf_matrix_val)
 
 # Results
 print(classification_report(y_test_final, prediction))
+print(classification_report(Yval, pred_val))
 
 # Filter Test Data to only include articles that were prediction relevant by logistic model function
 df_test['prediction'] = prediction
 df_test_predicted_relevant = df_test[df_test['prediction'] == 1]
 
+# Filter validation set Data to only include articles that were prediction relevant by logistic model function
+df_val['prediction'] = pred_val
+df_val_predicted_relevant = df_val[df_val['prediction'] == 1]
+
 # Remove relevance and prediction columns (as they're redundant for next part of classification)
 df_test_predicted_relevant = df_test_predicted_relevant.drop(columns=["relevance", "prediction"])
+df_val_predicted_relevant = df_val_predicted_relevant.drop(columns=["relevance", "prediction"])
+df_val = df_val.drop(columns=["relevance", "prediction"])
+
 
 print(df_test_predicted_relevant.head())
+print(df_val_predicted_relevant.head())
+print(df_val.head())
 
 # creating a ditionary with the labels
 codes_categories = {'ARTS CULTURE ENTERTAINMENT': 0,
@@ -159,8 +181,22 @@ codes_categories = {'ARTS CULTURE ENTERTAINMENT': 0,
 df_test_predicted_relevant['topic_code'] = df_test_predicted_relevant['topic']
 df_test_predicted_relevant = df_test_predicted_relevant.replace({'topic_code': codes_categories})
 
+df_val_predicted_relevant['topic_code'] = df_val_predicted_relevant['topic']
+df_val_predicted_relevant = df_val_predicted_relevant.replace({'topic_code': codes_categories})
+
+df_val['topic_code'] = df_val['topic']
+df_val = df_val.replace({'topic_code': codes_categories})
+
 print(df_test_predicted_relevant.head())
+print(df_val_predicted_relevant.head())
+print(df_val.head())
+print(df_val.shape)
 
 # Save Logistic Regression model in Pickle file
 with open('df_test_predicted_relevant.pickle', 'wb') as output:
     pickle.dump(df_test_predicted_relevant, output)
+with open('df_val_predicted_relevant.pickle', 'wb') as output:
+    pickle.dump(df_val_predicted_relevant, output)
+with open('df_val.pickle', 'wb') as output:
+    pickle.dump(df_val, output)
+

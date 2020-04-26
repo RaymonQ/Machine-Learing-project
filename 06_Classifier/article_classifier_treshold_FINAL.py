@@ -108,24 +108,30 @@ with open(path_data2 + 'tfidf_custom.pickle', 'rb') as data:
     tfidf_custom = pickle.load(data)
 with open(path_data3 + 'df_test_predicted_relevant.pickle', 'rb') as data:
     df_test_predicted_relevant = pickle.load(data)
+with open(path_data3 + 'df_val_predicted_relevant.pickle', 'rb') as data:
+    df_val_predicted_relevant = pickle.load(data)
+with open(path_data3 + 'df_val.pickle', 'rb') as data:
+    df_val = pickle.load(data)
 
 classifiers = [gbm, knn, mnb, rf, svm, nn]
 classifiers_name = ['GradientBoost', 'NearestNeighbour', 'MultinomBayes', 'RandomForest', 'SupportVector',
                     'Multiperceptron']
 
 # 1 == NN, 0 == SVM
-modelselection = 0
+modelselection = 1
 show_filtered_results = 0
-show_unfiltered_results = 1
+show_unfiltered_results = 0
 # train a class unfiltered
 with_cat_unfiltered = 0
-show_final_results = 0
+show_final_results = 1
+# show validation set
+with_validation_set = 0
 # show the stats for each categorie for true
 show_stats = 1
 # show the topX of each category
 topX = 10
 # make the threshold less agressive with a smaller number (range = [0,1])
-threshold_multiplier = 0.9
+threshold_multiplier = .9
 
 if modelselection:
     classifiers = [nn]
@@ -180,10 +186,16 @@ if show_unfiltered_results:
         features_train_filtered = tfidf_custom.fit_transform(df_train['article_words']).toarray()
         labels_train_filtered = df_train['topic_code']
 
-    # applying the tfidf transform
-    features_test_unfiltered = tfidf_custom.transform(df_test_unfiltered['article_words']).toarray()
-    labels_test_unfiltered = df_test_unfiltered['topic_code']
-    articles_num = df_test_unfiltered['article_number']
+    if with_validation_set:
+        # applying the tfidf transform
+        features_test_unfiltered = tfidf_custom.transform(df_val['article_words']).toarray()
+        labels_test_unfiltered = df_val['topic_code']
+        articles_num = df_val['article_number']
+    else:
+        # applying the tfidf transform
+        features_test_unfiltered = tfidf_custom.transform(df_test_unfiltered['article_words']).toarray()
+        labels_test_unfiltered = df_test_unfiltered['topic_code']
+        articles_num = df_test_unfiltered['article_number']
 
     num = 0
     for classifier in classifiers:
@@ -196,11 +208,16 @@ if show_final_results:
     # Final TEST DATA from Binary classification
     # fitting the tfidf transform on the whole train data
     features_train_filtered = tfidf_custom.fit_transform(df_train['article_words']).toarray()
-    # applying the tfidf transform
-    features_test_filtered = tfidf_custom.transform(df_test_predicted_relevant['article_words']).toarray()
     labels_train_filtered = df_train['topic_code']
-    labels_test_filtered = df_test_predicted_relevant['topic_code']
-    articles_num = df_test_predicted_relevant['article_number']
+    # applying the tfidf transform
+    if with_validation_set:
+        features_test_filtered = tfidf_custom.transform(df_val_predicted_relevant['article_words']).toarray()
+        labels_test_filtered = df_val_predicted_relevant['topic_code']
+        articles_num = df_val_predicted_relevant['article_number']
+    else:
+        features_test_filtered = tfidf_custom.transform(df_test_predicted_relevant['article_words']).toarray()
+        labels_test_filtered = df_test_predicted_relevant['topic_code']
+        articles_num = df_test_predicted_relevant['article_number']
 
     num = 0
     for classifier in classifiers:
