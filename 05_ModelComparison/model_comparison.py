@@ -21,10 +21,10 @@ def create_table(models, model_names):
         f1_macro.append(f1_macro_test)
         training_accuracies.append(accuracy_train)
         test_accuracies.append(accuracy_test)
+    table['F1_macro Test'] = f1_macro
     table['Accuracy Training'] = training_accuracies
     table['Accuracy Test'] = test_accuracies
-    table['F1_weighted Test'] = f1_weigthed
-    table['F1_macro Test'] = f1_macro
+
     return table
 
 
@@ -61,11 +61,11 @@ classifiers = [gbm, knn, mnb, rf, svm, nn]
 classifiers_name = ['GradientBoost', 'NearestNeighbour', 'MultinomBayes', 'RandomForest', 'SupportVector',
                     'Multiperceptron']
 
-classifiers = [svm, nn]
-classifiers_name = ['SupportVector', 'Multiperceptron']
+# classifiers = [svm, nn]
+# classifiers_name = ['SupportVector', 'Multiperceptron']
 
 df_table = create_table(classifiers, classifiers_name)
-df_table_sorted = df_table.sort_values(by='Accuracy Test', ascending=False)
+df_table_sorted = df_table.sort_values(by='F1_macro Test', ascending=False)
 print(df_table_sorted)
 
 # saving the table
@@ -108,3 +108,19 @@ with open('df_table_sorted.pickle', 'wb') as output:
 # 3      RandomForest              99.85          74.63
 # 2     MultinomBayes              90.22          74.21
 # 1  NearestNeighbour              90.00          64.15
+
+#                Name  Accuracy Training  Accuracy Test  F1_weighted Test  \
+# 4     SupportVector              82.49           75.8             75.93
+# 5   Multiperceptron              93.11           75.0             75.14
+# 1  NearestNeighbour              62.17           57.8             56.35
+# 2     MultinomBayes              56.80           54.8             57.21
+# 0     GradientBoost              53.54           53.2             52.31
+# 3      RandomForest              53.52           52.8             49.82
+#
+#    F1_macro Test
+# 4          74.91
+# 5          74.80
+# 1          39.28
+# 2          38.86
+# 0          32.10
+# 3          31.85

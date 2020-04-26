@@ -1,20 +1,31 @@
 import pickle
 import pandas as pd
+from sklearn.metrics import f1_score, recall_score, precision_score
 
 
 def sort_probs(probs, cat):
-    return probs.sort_values(by=cat, ascending=False)[[cat, 'topic_code']]
+    if 'article_number' in probs.columns:
+        return probs.sort_values(by=cat, ascending=False)[[cat, 'topic_code', 'article_number']]
+    else:
+        return probs.sort_values(by=cat, ascending=False)[[cat, 'topic_code']]
 
 
-def classify_articles(model, features, labels, stats, topx, threshold, dataset):
+def classify_articles(model, features, labels, article_numbers, stats, topx, threshold, dataset):
     print('\nClassifier: ' + str(model) + '\n')
     print('Performance on ' + dataset + '.\n')
     probab_test = model.predict_proba(features)
+    prediction = model.predict(features)
     df_proba = pd.DataFrame(labels)
+    f1s = f1_score(labels, prediction, average=None)
+    recalls = recall_score(labels, prediction, average=None)
+    precisions = precision_score(labels, prediction, average=None)
 
     for i in range(probab_test.shape[1]):
         column = "p" + str(i)
         df_proba[column] = probab_test[:, i]
+
+    if article_numbers is not None:
+        df_proba['article_number'] = article_numbers
 
     codes_categories = {'ARTS CULTURE ENTERTAINMENT': 0,
                         'BIOGRAPHIES PERSONALITIES PEOPLE': 1,
@@ -45,6 +56,7 @@ def classify_articles(model, features, labels, stats, topx, threshold, dataset):
         overall_hits_sug += hits_sug.astype(int).sum()
         if stats:
             print(top_x)
+            print('\nF1 : ' + str(f1s[i]) + ', precision: ' + str(precisions[i]) + ', recall: ' + str(recalls[i]) + '.')
             print('\nCategory ' + inv_code_categories[i] + ': ' + str(hits.astype(int).sum()) + '/' + str(topx) +
                   '.\n\n')
             print(suggestions)
@@ -105,9 +117,9 @@ with open(path_data3 + 'df_test_predicted_relevant.pickle', 'rb') as data:
 #                     'Multiperceptron']
 
 # 1 == NN, 0 == SVM
-modelselection = 1
-show_filtered_results = 1
-show_unfiltered_results = 0
+modelselection = 0
+show_filtered_results = 0
+show_unfiltered_results = 1
 show_final_results = 0
 # show the stats for each categorie for true
 show_stats = 1
@@ -132,7 +144,7 @@ else:
 if show_filtered_results:
     # get the performance for the test data set from the training data set w/o irrelevant articles
     for classifier in classifiers:
-        classify_articles(classifier, features_test, labels_test, show_stats, topX, thresholds,
+        classify_articles(classifier, features_test, labels_test, None, show_stats, topX, thresholds,
                           'TEST data SET from TRAINING data WITHOUT irrelevant articles')
 
     # get the performance for the FINAL test data set w/o the irrelevant articles
@@ -140,9 +152,10 @@ if show_filtered_results:
     # applying the tfidf transform
     features_final_test = tfidf_custom.transform(df_test['article_words']).toarray()
     labels_final_test = df_test['topic_code']
+    articles_num = df_test['article_number']
 
     for classifier in classifiers:
-        classify_articles(classifier, features_final_test, labels_final_test, show_stats, topX, thresholds,
+        classify_articles(classifier, features_final_test, labels_final_test, articles_num, show_stats, topX, thresholds,
                           'FINAL TEST data set WITHOUT irrelevant articles')
 
 if show_unfiltered_results:
@@ -150,17 +163,19 @@ if show_unfiltered_results:
     # get the performance for the FINAL test data set with the irrelevant articles
     features_final_test_unfiltered = tfidf_custom.transform(df_test_unfiltered['article_words']).toarray()
     labels_final_test_unfiltered = df_test_unfiltered['topic_code']
+    articles_num = df_test_unfiltered['article_number']
 
     for classifier in classifiers:
-        classify_articles(classifier, features_final_test_unfiltered, labels_final_test_unfiltered, show_stats, topX,
-                          thresholds, 'FINAL TEST data set WITH irrelevant articles')
+        classify_articles(classifier, features_final_test_unfiltered, labels_final_test_unfiltered, articles_num,
+                          show_stats, topX, thresholds, 'FINAL TEST data set WITH irrelevant articles')
 
 if show_final_results:
 
     # get the performance for the FINAL test data set with the binary classification before
     features_test_filtered = tfidf_custom.transform(df_test_predicted_relevant['article_words']).toarray()
     labels_test_filtered = df_test_predicted_relevant['topic_code']
+    articles_num = df_test_predicted_relevant['article_number']
 
     for classifier in classifiers:
-        classify_articles(classifier, features_test_filtered, labels_test_filtered, show_stats, topX,
+        classify_articles(classifier, features_test_filtered, labels_test_filtered, articles_num, show_stats, topX,
                           thresholds, 'FINAL TEST data set binary classification')

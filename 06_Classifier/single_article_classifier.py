@@ -1,6 +1,7 @@
 import pickle
 import pandas as pd
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import f1_score, recall_score, precision_score
 
 
 def sort_probs(probs, cat):
@@ -11,7 +12,11 @@ def classify_articles(model, features, labels, stats, topx, dataset):
     print('\nClassifier: ' + str(model) + '\n')
     print('Performance on ' + dataset + '.\n')
     probab_test = model.predict_proba(features)
+    prediction = model.predict(features)
     df_proba = pd.DataFrame(labels)
+    f1s = f1_score(labels, prediction, average=None)
+    recalls = recall_score(labels, prediction, average=None)
+    precisions = precision_score(labels, prediction, average=None)
 
     for i in range(probab_test.shape[1]):
         column = "p" + str(i)
@@ -39,6 +44,7 @@ def classify_articles(model, features, labels, stats, topx, dataset):
         overall_hits += hits.astype(int).sum()
         if stats:
             print(top_x)
+            print('\nF1 : ' + str(f1s[i]) + ', precision: ' + str(precisions[i]) + ', recall: ' + str(recalls[i]) + '.')
             print('\nCategory ' + inv_code_categories[i] + ': ' + str(hits.astype(int).sum()) + '/' + str(topx) +
                   '.\n\n')
 
@@ -92,7 +98,7 @@ classifiers = [gbm, knn, mnb, rf, svm, nn]
 classifiers_name = ['GradientBoost', 'NearestNeighbour', 'MultinomBayes', 'RandomForest', 'SupportVector',
                     'Multiperceptron']
 
-classifier = svm
+classifier = nn
 # show the stats for each categorie for true
 show_stats = 1
 # show the topX of each category
