@@ -9,9 +9,11 @@ import time
 from sklearn.feature_extraction.text import TfidfVectorizer as TfIdf
 
 from sklearn.metrics import confusion_matrix, classification_report
+from sklearn.pipeline import Pipeline
 
 # Decide if to implement grid search or not
 fit_grid_search = 0
+tfidf_cv = 0
 
 # Specify Path Project
 # path_project = "/Users/TalWe/.vscode/COMP9417 Group Assignment/COMP9417-Group-Assignment/"
@@ -101,26 +103,27 @@ if fit_grid_search:
     predicted_classes_test = logit_best_grid.predict(X_test_final)
 
 
-'''# Train Validation Split on Training Data to apply Cross Validation to
-
-for i in range(10):
-    X_train, X_test, y_train, y_test = train_test_split(features_train, labels_train, test_size=0.20, random_state=None)
-
-    # Validation test data
-    logit_model = LogisticRegression()
-
-    # Fit model 
-    logit_model = logit_model.fit(X_train, y_train)
-    prediction = logit_model.predict(X_test)
+# Reference:
+# https://stackoverflow.com/questions/44066264/how-to-choose-parameters-in-tfidfvectorizer-in-sklearn-during-unsupervised-clust
+# Utilised method of gridsearchcv to tune TF-IDF hyperparameters
+# User - David Batista
+if tfidf_cv:
+    pipeline = Pipeline([
+        ('tfidf', TfIdf(stop_words=None,sublinear_tf=True,max_df=1.,ngram_range=(1,1))),
+        ('clf', LogisticRegression())
+    ])
     
-    # Confusion metrics
-    cnf_matrix = confusion_matrix(y_test, prediction)
-    print(cnf_matrix)
+    parameters = {
+        'tfidf__min_df': (1,5,10,20),
+        'tfidf__max_features': (100,500,1000,2000,5000,10000)
+    }
     
-    # Results
+    scoring = {'AUC': 'roc_auc', 'F1': 'f1', 'Precision': 'precision', 'Recall': 'recall'}
     
-    print(classification_report(y_test, prediction))
-'''
+    start_time = time.process_time()
+    grid_search_tune = GridSearchCV(pipeline, parameters, cv=5, n_jobs=-1,verbose=1, scoring=scoring, refit='F1')
+    grid_search_tune.fit(df['article_words'],labels_train)
+    end_time = time.process_time() - start_time
 
 # Real test data
 # parameters chosen from Cross Validation
