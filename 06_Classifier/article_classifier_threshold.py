@@ -78,7 +78,7 @@ path_project = "/Users/yannickschnider/PycharmProjects/COMP9417-Group-Assignment
 # importing objects from folder data in feature engineering
 path_data = path_project + '04_ModelTraining/Models/'
 path_data2 = path_project + '03_FeatureEngineering/Data/'
-path_data3 = path_project + 'Raymon/'
+path_data3 = path_project + '04_2_BinaryClassification/'
 
 with open(path_data + 'GBM.pickle', 'rb') as data:
     gbm = pickle.load(data)
