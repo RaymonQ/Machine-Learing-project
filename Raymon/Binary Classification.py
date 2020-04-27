@@ -14,14 +14,14 @@ from sklearn.metrics import confusion_matrix, classification_report
 fit_grid_search = 0
 
 # Specify Path Project
-#path_project = "/Users/TalWe/.vscode/COMP9417 Group Assignment/COMP9417-Group-Assignment/"
+# path_project = "/Users/TalWe/.vscode/COMP9417 Group Assignment/COMP9417-Group-Assignment/"
 path_project = "/Users/yannickschnider/PycharmProjects/COMP9417-Group-Assignment/"
 
 # read data
 df = pd.read_csv(path_project + "00_TaskHandout/training.csv", sep=',')
 df_test = pd.read_csv(path_project + "00_TaskHandout/test.csv", sep=',')
 
-#TfIdf settings
+# TfIdf settings
 ngram_range = (1, 1)
 min_df = 10
 max_df = 1.

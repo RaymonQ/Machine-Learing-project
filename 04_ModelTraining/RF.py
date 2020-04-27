@@ -57,12 +57,7 @@ if calc_default_model:
     print('The accuracy of the default Random Forest classifier on the TEST set is: ' +
           str(round(accuracy_score(labels_test, predicted_classes_test)*100, 2)) + ' %.')
     dump_model(rf_default)
-    # Output for 1000 unigrams:
-    # The accuracy of the default Random Forest classifier on the TRAIN set is: 97.95 %.
-    # The accuracy of the default Random Forest classifier on the TEST set is: 73.27 %.
-    # Output for 300 unigrams:
-    # The accuracy of the default Random Forest classifier on the TRAIN set is: 97.67 %.
-    # The accuracy of the default Random Forest classifier on the TEST set is: 71.38 %.
+
 if calc_tuned_model:
     # Tuning the RF classifier using first a random search and then a grid search to find the optimal parameters
 
@@ -151,9 +146,3 @@ if calc_fixed_model:
     print('The accuracy of the fixed Random Forest classifier on the TEST set is: ' +
           str(round(accuracy_score(labels_test, predicted_classes_test)*100, 2)) + ' %.')
     dump_model(rf_fixed)
-    # Output 1
-    # The accuracy of the fixed Random Forest classifier on the TRAIN set is: 98.43 %.
-    # The accuracy of the fixed Random Forest classifier on the TEST set is: 73.79 %.
-    # output randsearch parameters
-    # The accuracy of the fixed Random Forest classifier on the TRAIN set is: 98.4 %.
-    # The accuracy of the fixed Random Forest classifier on the TEST set is: 73.06 %.

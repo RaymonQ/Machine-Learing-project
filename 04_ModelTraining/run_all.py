@@ -9,10 +9,6 @@ path_folder = '04_ModelTraining'
 files = [file for file in os.listdir(path + path_folder) if file.endswith(".py")]
 # remove this file to avoid a infinity loop
 files.remove('run_all.py')
-# files.remove('MNB.py')
-# files.remove('RF.py')
-# files.remove('GBM.py')
-# files.remove('KNN.py')
 
 # run all the scripts one after another
 for script in files:

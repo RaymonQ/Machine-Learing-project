@@ -1,8 +1,9 @@
 import pickle
 from sklearn.neural_network import MLPClassifier as Mlp
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, f1_score
 from sklearn.model_selection import RandomizedSearchCV, GridSearchCV, ShuffleSplit
-import time
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 def dump_model(model):
@@ -35,7 +36,8 @@ with open(path_data + 'tfidf_custom.pickle', 'rb') as data:
 
 calc_default_model = 0
 calc_tuned_model = 0
-calc_fixed_model = 1
+calc_fixed_model = 0
+make_plot = 1
 
 if calc_default_model:
     # see default parameters of RF classifier
@@ -111,13 +113,46 @@ if calc_fixed_model:
           str(round(accuracy_score(labels_test, predicted_classes_test) * 100, 2)) + ' %.')
     dump_model(mlp_fixed)
 
-# unigrams:
-# The accuracy of the fixed MLP classifier on the TRAIN set is: 92.81 %.
-# The accuracy of the fixed MLP classifier on the TEST set is: 76.0 %.
-# with bigrams:
-# The accuracy of the fixed MLP classifier on the TRAIN set is: 92.44 %.
-# The accuracy of the fixed MLP classifier on the TEST set is: 74.63 %.
+if make_plot:
+    layersizes = [int(x) for x in np.linspace(50, 500, 10)]
+    acc_train = []
+    acc_test = []
+    f1_train = []
+    f1_test = []
+    for lay in layersizes:
+        # see default parameters of RF classifier
+        mlp_fixed = Mlp(hidden_layer_sizes=(lay,), random_state=1, max_iter=500, solver='adam', learning_rate='constant',
+                        activation='tanh', alpha=.05)
+        # hidden_layer_sizes: The ith element represents the number of neurons in the ith hidden layer.
 
-# unigrams, minority:
-# The accuracy of the fixed MLP classifier on the TRAIN set is: 96.05 %.
-# The accuracy of the fixed MLP classifier on the TEST set is: 76.31 %.
+        # fit the model
+        mlp_fixed.fit(features_train, labels_train)
+
+        predicted_classes_train = mlp_fixed.predict(features_train)
+        predicted_classes_test = mlp_fixed.predict(features_test)
+
+        acc_train.append(accuracy_score(labels_train, predicted_classes_train))
+        acc_test.append(accuracy_score(labels_test, predicted_classes_test))
+        f1_train.append(f1_score(labels_train, predicted_classes_train, average='macro'))
+        f1_test.append(f1_score(labels_test, predicted_classes_test, average='macro'))
+        print('The accuracy of the fixed MLP classifier on the TRAIN set is: ' +
+              str(round(accuracy_score(labels_train, predicted_classes_train) * 100, 2)) + ' %.')
+
+        print('The accuracy of the fixed MLP classifier on the TEST set is: ' +
+              str(round(accuracy_score(labels_test, predicted_classes_test) * 100, 2)) + ' %.')
+    #     # dump_model(mlp_fixed)
+
+    plt.plot(layersizes, acc_train, 'b')
+    plt.plot(layersizes, acc_test, 'g')
+    plt.plot(layersizes, f1_train, 'b', linestyle='dashed')
+    plt.plot(layersizes, f1_test, 'g', linestyle='dashed')
+    plt.xlabel('Number of neurons')
+    plt.ylabel('Score')
+    plt.legend(['accuracy train set', 'accuracy validation set', 'f1 macro train set', 'f1 macro validation set'])
+    plt.ylim([0.4, 1])
+    plt.title('GridSearch Scores Multi Perception Classifier')
+    plt.axvline(300, 0, 1, color='r', linestyle='dashed', linewidth=1)
+    plt.xticks(layersizes)
+    plt.show()
+
+

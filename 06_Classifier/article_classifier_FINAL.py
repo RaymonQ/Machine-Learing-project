@@ -158,17 +158,4 @@ if show_unfiltered_results_with_cat_Irrelevant:
                           'FINAL TEST data set WITH TRAINED irrelevant articles')
         num += 1
 
-# Results for 1000 unigramms:
 
-# SVM:
-#
-# OVERALL RESULT: 69/100.
-# (Performance on FINAL TEST data set WITHOUT irrelevant articles.)
-# OVERALL RESULT: 54/100.
-# (Performance on FINAL TEST data set WITH irrelevant articles.)
-# NN:
-#
-# OVERALL RESULT: 73/100.
-# (Performance on FINAL TEST data set WITHOUT irrelevant articles.)
-# OVERALL RESULT: 55/100.
-# (Performance on FINAL TEST data set WITH irrelevant articles.)

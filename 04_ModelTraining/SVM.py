@@ -189,20 +189,4 @@ if calc_fixed_model:
           str(round(accuracy_score(labels_test, predicted_classes_fixed_test)*100, 2)) + ' %.')
     dump_model(svc_fixed)
 
-# Output for 1000 unigrams:
-# The accuracy of default SVC on the TRAIN set is: 34.97 %.
-# The accuracy of default SVC on the TEST is: 35.64 %.
-# The accuracy of tuned SVC on the TRAIN set is: 73.64 %.
-# The accuracy of tuned SVC on the TEST is: 72.33 %.
 
-# Output for 300 unigrams:
-# he accuracy of default SVC on the TRAIN set is: 56.01 %.
-# The accuracy of default SVC on the TEST is: 57.65 %.
-# The accuracy of tuned SVC on the TRAIN set is: 73.5 %.
-# The accuracy of tuned SVC on the TEST is: 72.43 %.
-
-# 1000 unigrams unbalanced
-# The accuracy of fixed SVC on the TRAIN set is: 88.75 %.
-# The accuracy of fixed SVC on the TEST is: 76.21 %.
-
-# 1000 unigrams balanced

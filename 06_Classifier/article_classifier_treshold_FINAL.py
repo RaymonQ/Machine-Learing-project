@@ -22,6 +22,12 @@ def classify_articles(model, model_names, model_number, features_train, features
     precisions = precision_score(labels_test, predicted_classes_test, average=None)
     print('\nClassifier: ' + model_names[model_number] + ' accuracy: ' +
           str(round(accuracy_score(labels_test, predicted_classes_test)*100, 2)) + ' %.\n')
+    print('\nClassifier: ' + model_names[model_number] + ' f1 macro: ' +
+          str(round(f1_score(labels_test, predicted_classes_test, average='macro') * 100, 2)) + ' %.\n')
+    print('\nClassifier: ' + model_names[model_number] + ' precision macro: ' +
+          str(round(precision_score(labels_test, predicted_classes_test, average='macro') * 100, 2)) + ' %.\n')
+    print('\nClassifier: ' + model_names[model_number] + ' recall macro: ' +
+          str(round(recall_score(labels_test, predicted_classes_test, average='macro') * 100, 2)) + ' %.\n')
     print('Performance on ' + dataset + '.\n')
 
     for i in range(probab_test.shape[1]):

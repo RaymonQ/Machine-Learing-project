@@ -52,12 +52,6 @@ if calc_default_model:
     print('The accuracy of the default GBM classifier on the TEST set is: ' +
           str(round(accuracy_score(labels_test, predicted_classes_test)*100, 2)) + ' %.')
 
-    # The output for 1000 unigrams (took an awful lot of time) is:
-    # The accuracy of the default GBM classifier on the TRAIN set is: 96.56 %.
-    # The accuracy of the default GBM classifier on the TEST set is: 75.16 %.
-    # The output for 300 unigrams is:
-    # The accuracy of the default GBM classifier on the TRAIN set is: 96.07 %.
-    # The accuracy of the default GBM classifier on the TEST set is: 72.43 %.
     dump_model(gbc_default)
 
 if calc_fixed_model:

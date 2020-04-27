@@ -48,10 +48,4 @@ print('The accuracy of MultinominalBayes on the TRAIN set is: ' +
 print('The accuracy of MultinominalBayes on the TEST set is: ' +
       str(round(accuracy_score(labels_test, predicted_classes_test)*100, 2)) + ' %.')
 dump_model(multinominalBayes)
-# The output for 1000 unigrams is:
-# The accuracy of MultinominalBayes on the TRAIN set is: 78.83 %.
-# The accuracy of MultinominalBayes on the TEST set is: 74.0 %.
-# The output for 300 unigrams is:
-# The accuracy of MultinominalBayes on the TRAIN set is: 74.66 %.
-# The accuracy of MultinominalBayes on the TEST set is: 70.96 %.
 
